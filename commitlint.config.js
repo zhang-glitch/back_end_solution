@@ -2,7 +2,7 @@ module.exports = {
   // 继承规则
   extends: ['@commitlint/config-conventional'],
   // 定义规则
-  roles: {
+  rules: {
     // type的类型定义
     'type-enum': [
       // 提交类型

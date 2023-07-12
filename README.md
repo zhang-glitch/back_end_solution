@@ -267,3 +267,117 @@ yarn husky add .husky/pre-commit "npx eslint --ext .js,.vue src"
 ```
 
 然后将`.husky/pre-commit`文件下的`npx eslint --ext .js,.vue src`修改成`npx lint-staged`。
+
+## svg 图标使用
+
+一般项目中，我们会使用到组件库提供的 svg 图标，如果不能满足条件，我们也会使用自定义的 svg 图标，那么如何使用呢？我们将对 svg 图标的使用封装成一个通用的组件。
+
+在 webpack 中实现 svg 图标注册。使用[`require.context()`](https://webpack.docschina.org/guides/dependency-management/#requirecontext)来引入指定文件夹下的所有 svg 图标。
+
+```js
+import SvgIcon from '@/components/SvgIcon'
+
+//
+// 通过 require.context() 函数来创建自己的 context
+const svgRequire = require.context('./svg', false, /\.svg$/)
+// 此时返回一个 require 的函数，可以接受一个 request 的参数，用于 require 的导入。
+// 该函数提供了三个属性，可以通过 require.keys() 获取到所有的 svg 图标
+// 遍历图标，把图标作为 request 传入到 require 导入函数中，完成本地 svg 图标的导入
+svgRequire.keys().forEach((svgIcon) => svgRequire(svgIcon))
+
+export default (app) => {
+  app.component('svg-icon', SvgIcon)
+}
+```
+
+并且需要使用[`svg-sprite-loader`](https://github.com/JetBrains/svg-sprite-loader)插件来协助我们显示 svg 图标。
+
+```js
+const path = require('path')
+function resolve(dir) {
+  return path.join(__dirname, dir)
+}
+module.exports = {
+  chainWebpack(config) {
+    // 设置 svg-sprite-loader
+    config.module.rule('svg').exclude.add(resolve('src/icons')).end()
+    config.module
+      .rule('icons')
+      .test(/\.svg$/)
+      .include.add(resolve('src/icons'))
+      .end()
+      .use('svg-sprite-loader')
+      .loader('svg-sprite-loader')
+      .options({
+        symbolId: 'icon-[name]'
+      })
+      .end()
+  }
+}
+```
+
+但是在 vite 中，我们可以通过插件完成，[具体看这里](https://juejin.cn/post/7251878440327512124#heading-10)
+
+## element-plus 表单验证要素
+
+- el-form 指定 model,rules 字段。
+- el-form-item 指定 prop 字段。
+
+并且可以通过`validator`来自定义校验规则。[具体参考这里](https://element-plus.org/zh-CN/component/form.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%A0%A1%E9%AA%8C%E8%A7%84%E5%88%99)
+
+## 接口设计
+
+对于接口的设计，如果可以参入后端设计，最好让后端都返回一个标识，来表示当前请求是否成功，方便我们在拦截器中做 message 提示。
+
+```js
+// 响应拦截器
+service.interceptors.response.use(
+  (response) => {
+    const { success, message, data } = response.data
+    //   要根据success的成功与否决定下面的操作
+    if (success) {
+      ElMessage.success(message)
+      // 成功返回解析后的数据
+      return data
+    } else {
+      // 业务错误
+      ElMessage.error(message) // 提示错误消息
+      return Promise.reject(new Error(message))
+    }
+  },
+  (error) => {
+    // 处理 token 超时问题
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.code === 401
+    ) {
+      // token超时
+    }
+    ElMessage.error(error.message) // 提示错误信息
+    return Promise.reject(error)
+  }
+)
+```
+
+在响应拦截器统一处理 message 提示。让我们在页面逻辑中不需要在过多的判断，来处理 message 消息。
+
+我们注意到上面出现错误，我们将返回一个 error promise。所以如果在页面中我们想要控制加载的状态。我们可以通过 try catch 来捕获错误。无论成功还是失败，都关闭加载状态。
+
+```js
+const store = useStore()
+const loading = ref(false)
+/**
+ * 对于接口设计，最好都返回一个成功 / 失败的标识。让我们更好的在axios难解其中处理message提示，然后返回error promise。
+
+ 在代码逻辑中就不需要处理message了。只需要去判断按钮加载的状态即可。
+ */
+const handleLogin = async () => {
+  loading.value = true
+  try {
+    await store.dispatch('user/postLogin', loginForm.value)
+  } finally {
+    loading.value = false
+  }
+}
+```
