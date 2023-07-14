@@ -381,3 +381,167 @@ const handleLogin = async () => {
   }
 }
 ```
+
+## 退出登录
+
+- 清除当前用户缓存的数据
+- 清除掉权限相关的配置
+- 返回登录页面
+
+主动退出和被动退出
+
+- 主动退出：用户点击退出按钮
+- 被动退出：token 失效或者单点登录。（**这些都是后端判断完毕，返回不同的状态码，前端在拦截器中处理一下就行。**）
+
+### 被动退出，主动处理
+
+在前端判断 token 是否过期，过期后，直接退出。
+
+- 登录成功后，我们保存一个时间戳在 localStorage 中。
+- 设置一个过期时间，每次请求判断当前 token 是否在过期时间段内。
+
+```js
+/**
+ * 获取时间戳
+ */
+export function getTimeStamp() {
+  return getItem(TIME_STAMP)
+}
+/**
+ * 设置时间戳
+ */
+export function setTimeStamp() {
+  setItem(TIME_STAMP, Date.now())
+}
+/**
+ * 是否超时
+ */
+export function isCheckTimeout() {
+  // 当前时间戳
+  const currentTime = Date.now()
+  // 缓存时间戳
+  const timeStamp = getTimeStamp()
+  return currentTime - timeStamp > TOKEN_TIMEOUT_VALUE
+}
+```
+
+## vite 中 js 使用 scss 变量
+
+文件命名`...module.scss`。以`module.scss`为后缀。然后通过`:export`进行导出，即可在 js 中导入直接使用。[具体可查看这里](https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass)
+
+```js
+// sidebar
+$menuText: #bfcbd9;
+$menuActiveText: #ffffff;
+$subMenuActiveText: #f4f4f5;
+
+$menuBg: #304156;
+$menuHover: #263445;
+
+$subMenuBg: #1f2d3d;
+$subMenuHover: #001528;
+
+$sideBarWidth: 210px;
+
+$hideSideBarWidth: 54px;
+$tagViewsList:#42b983;
+
+// 处理动画时长
+$sideBarDuration: 0.28s;
+// JS 与 scss 共享变量，在 scss 中通过 :export 进行导出，在 js 中可通过 ESM 进行导入
+:export {
+  menuText: $menuText;
+  menuActiveText: $menuActiveText;
+  subMenuActiveText: $subMenuActiveText;
+  menuBg: $menuBg;
+  menuHover: $menuHover;
+  subMenuBg: $subMenuBg;
+  subMenuHover: $subMenuHover;
+  sideBarWidth: $sideBarWidth;
+  tagViewsList:#42b983;
+}
+```
+
+## 菜单列表处理
+
+一般情况下，我们都会通过当前用户的路由列表来获取到对应的菜单列表。所以我们就需要去处理一些路由列表。
+
+获取路由表
+
+- [`router.options.routes`](https://router.vuejs.org/zh/api/interfaces/RouterOptions.html#Properties-routes): 获取初始路由表 （新增的路由表无法获取到）
+- [`router.getRoutes()`](https://router.vuejs.org/zh/api/interfaces/Router.html#Methods-getRoutes): 获取所有路由列表。**并且可以获取父级路由和子级路由。**
+
+由于`router.getRoutes()`获将二级路由也获取到当前列表中。所以我们需要将其过滤掉。我们只是用，嵌套路由下的列表即可。而无需将其提升到一级路由。
+
+```js
+/**
+ * 获取全部二级路由
+ 通过当前嵌套路由的children来获取即可。
+ */
+
+function getRouteChildren(routes) {
+  const _routes = []
+  for (const item of routes) {
+    if (item?.children?.length > 0) {
+      _routes.push(...item.children)
+    }
+  }
+  return _routes
+}
+```
+
+过滤二级路由，因为我们菜单列表展示的和我们路由列表的结构是一样的。所以我们需要将二级路由过滤掉。
+
+```js
+/**
+ * 过滤重复路由
+ */
+export function filterRoutes(routes) {
+  // 获取二级路由
+  const routeChildren = getRouteChildren(routes)
+  return routes.filter((item) => {
+    return !routeChildren.find((route) => route.path === item.path)
+  })
+}
+```
+
+然后就是处理那些路由是在菜单栏中可见的。这个需要根据你们的逻辑来判断。主要就是递归处理 route.children 中的路由而已。
+
+下面来介绍 menu 组件的一些属性
+
+```js
+:collapse // 是否·折叠菜单
+:default-active // 当前选中的菜单，这个和每个item的index的值相匹配。一般我们会使用path来作为index的值。
+:background-color // 背景颜色
+:text-color // 文字颜色
+:active-text-color // 当前选中的文字颜色
+:unique-opened="true" // 是否只展开一个submenu
+:collapse-transition // 是否使用折叠动画·
+router // 开启路由，他会将item的index作为路由的path。
+```
+
+在设计菜单组件的时候，我们需要将子菜单封装成一个·组件，这样便于我们处理嵌套菜单。
+
+```js
+<template>
+  <!-- 判断是否直接展示menu-item还是submenu-item -->
+  <el-sub-menu v-if="menu.children.length > 0" :index="menu.path">
+    <template #title>
+      <menu-item :title="menu.meta.title" :icon="menu.meta.icon"></menu-item>
+    </template>
+    <!-- 循环渲染，多层menu -->
+    <side-bar-item
+      v-for="route in menu.children"
+      :menu="route"
+      :key="route.path"
+    ></side-bar-item>
+  </el-sub-menu>
+  <el-menu-item v-else :index="menu.path">
+    <menu-item
+      :title="menu.meta.title"
+      :icon="menu.meta.icon"
+      :iconName="menu.meta.iconName"
+    ></menu-item>
+  </el-menu-item>
+</template>
+```

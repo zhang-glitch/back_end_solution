@@ -2,7 +2,7 @@
   <div class="login">
     <div class="login-container">
       <div class="login-title">用户登录</div>
-      <el-form :model="loginForm" :rules="loginFormRules">
+      <el-form :model="loginForm" :rules="loginFormRules" ref="formRef">
         <el-form-item class="login-form-item" prop="username">
           <el-icon><Avatar /></el-icon>
           <el-input
@@ -46,6 +46,8 @@ import { useStore } from 'vuex'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 // import { Hide, View } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { setTimeStamp } from '@/utils/auth'
 
 const loginForm = ref({
   username: 'super-admin',
@@ -85,14 +87,25 @@ const loading = ref(false)
 
  在代码逻辑中就不需要处理message了。只需要去判断按钮加载的状态即可。
  */
+const formRef = ref(null)
 const handleLogin = async () => {
-  loading.value = true
-  try {
-    await store.dispatch('user/postLogin', loginForm.value)
-    router.push('/')
-  } finally {
-    loading.value = false
-  }
+  formRef.value.validate(async (flag) => {
+    if (flag) {
+      loading.value = true
+      try {
+        await store.dispatch('user/postLogin', loginForm.value)
+        // 登录成功后保存登录时间戳
+        setTimeStamp()
+        router.push('/')
+        // 获取用户信息
+        store.dispatch('user/getUserInfo')
+      } finally {
+        loading.value = false
+      }
+    } else {
+      ElMessage.info('验证失败!')
+    }
+  })
 }
 </script>
 

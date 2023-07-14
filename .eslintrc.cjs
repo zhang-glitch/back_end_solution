@@ -30,6 +30,7 @@ module.exports = {
    */
   rules: {
     // 'comma-dangle': 1
-    'space-before-function-paren': 'off'
+    'space-before-function-paren': 'off',
+    'vue/multi-word-component-names': 'off'
   }
 }

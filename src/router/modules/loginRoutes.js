@@ -1,9 +1,7 @@
-const loginRoutes = [
-  {
-    name: 'login',
-    path: '/login',
-    component: () => import('@/views/login/index.vue')
-  }
-]
+const loginRoutes = {
+  name: 'login',
+  path: '/login',
+  component: () => import('@/views/login/index.vue')
+}
 
 export default loginRoutes

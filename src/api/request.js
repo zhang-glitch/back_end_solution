@@ -3,8 +3,6 @@ import store from '@/store'
 import { ElMessage } from 'element-plus'
 import { isCheckTimeout } from '@/utils/auth'
 import md5 from 'md5'
-import { removeItem } from '@/utils/storage'
-import { TOKEN } from '@/constants'
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
@@ -22,9 +20,9 @@ service.interceptors.request.use(
       // 如果token存在 注入token
       config.headers.Authorization = `Bearer ${store.getters.token}`
       if (isCheckTimeout()) {
-        // 登出操作
-        removeItem(TOKEN)
-        store.commit('user/setToken', '')
+        // 登出操作 token超时，主动退出
+        store.dispatch('user/logout')
+        ElMessage.error('登录超时，请重新登录!') // 提示错误消息
         return Promise.reject(new Error('token 失效'))
       }
     }
