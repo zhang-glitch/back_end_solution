@@ -14,5 +14,9 @@ export default {
   // 是否展开sidebar
   sideBarOpen(state) {
     return state.app.sideBarOpen
+  },
+  // 国际化
+  language(state) {
+    return state.app.language
   }
 }

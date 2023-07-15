@@ -1,7 +1,8 @@
 <template>
   <div class="login">
     <div class="login-container">
-      <div class="login-title">用户登录</div>
+      <div class="login-title">{{ $t('msg.login.title') }}</div>
+      <language-select></language-select>
       <el-form :model="loginForm" :rules="loginFormRules" ref="formRef">
         <el-form-item class="login-form-item" prop="username">
           <el-icon><Avatar /></el-icon>
@@ -9,7 +10,7 @@
             v-model="loginForm.username"
             class=""
             size="large"
-            placeholder="请输入用户名"
+            :placeholder="$t('msg.login.usernamePlaceholder')"
           />
         </el-form-item>
 
@@ -19,7 +20,7 @@
             v-model="loginForm.password"
             type="password"
             size="large"
-            placeholder="请输入密码"
+            :placeholder="$t('msg.login.passwordPlaceholder')"
             show-password
           />
           <!-- <el-icon @click="handleEye" class="eye-hide-view-icon">
@@ -33,7 +34,7 @@
             @click="handleLogin"
             class="login-btn"
           >
-            登录
+            {{ $t('msg.login.loginBtn') }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -45,9 +46,12 @@
 import { useStore } from 'vuex'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 // import { Hide, View } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { setTimeStamp } from '@/utils/auth'
+import { validatePassword } from './rules'
+import LanguageSelect from '@/components/language-select/index.vue'
 
 const loginForm = ref({
   username: 'super-admin',
@@ -60,21 +64,21 @@ const loginForm = ref({
 //   isEye.value = !isEye.value
 // }
 
+const i18n = useI18n()
 // 表单校验
 const loginFormRules = ref({
   username: [
     {
       required: true,
       trigger: 'blur',
-      message: 'dwdadw'
-      // message: i18n.t('msg.login.usernameRule')
+      message: i18n.t('msg.login.usernameRule')
     }
   ],
   password: [
     {
       required: true,
-      trigger: 'blur'
-      // validator: validatePassword()
+      trigger: 'blur',
+      validator: validatePassword()
     }
   ]
 })
@@ -137,11 +141,22 @@ export default {
 
     .login-title {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 40px;
       font-size: 18px;
       font-weight: 600;
       letter-spacing: 2px;
       color: #fff;
+    }
+
+    /* 国际化 */
+    .language-select {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      font-size: 24px;
+      background: #fff;
+      padding: 3px;
+      border-radius: 2px;
     }
 
     /* 表单项 */

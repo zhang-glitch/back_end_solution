@@ -545,3 +545,91 @@ router // 开启路由，他会将item的index作为路由的path。
   </el-menu-item>
 </template>
 ```
+## el-dropdown中使用el-tooltip出现错误
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8d66f0aba04c405eb87178d2576f29c6~tplv-k3u1fbpfcp-watermark.image?)
+需要将el-tooltip组件包裹一层。
+```js
+<!-- 这里需要包裹一层，不然会报错 -->
+  <div>
+    <el-tooltip :effect="effect" content="国际化">
+      <svg-icon icon="language"></svg-icon>
+    </el-tooltip>
+  </div>
+```
+## 国际化
+对于国际化，我们需要处理两部分。一部分是组件库的国际化，一部分是我们自己文本的国际化。
+
+- 组件库国际化，我们可以使用对应组件库提供的api来完成。比如，element-plus。
+```js
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import en from 'element-plus/lib/locale/lang/en'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+
+
+app
+  .use(ElementPlus, {
+    locale: store.getters.language === 'zh' ? zhCn : en
+  })
+```
+
+- 自定义国际化。我们需要定义对应的语言包。就是将对应的文本事先编写多种对应的语言。然后使用[`vue-i18n`](https://www.npmjs.com/package/vue-i18n)来注册我们的语言包。
+
+```js
+import { createI18n } from 'vue-i18n'
+import zhLocale from './lang/zh'
+import enLocale from './lang/en'
+import store from '@/store'
+
+const messages = {
+  en: {
+    msg: {
+      ...enLocale
+    }
+  },
+  zh: {
+    msg: {
+      ...zhLocale
+    }
+  }
+}
+
+const i18nInstance = createI18n({
+  // 使用 Composition API 模式，则需要将其设置为false
+  legacy: false,
+  // 全局注入 $t 函数
+  globalInjection: true,
+  messages,
+  locale: store.getters.language
+})
+
+export default i18nInstance
+```
+语言包
+```js
+// zh.js
+export default {
+  login: {
+    title: '用户登录',
+    loginBtn: '登录',
+    usernameRule: '用户名为必填项',
+    passwordRule: '密码不能少于6位',
+    usernamePlaceholder: '请输入用户名',
+    passwordPlaceholder: '请输入密码'
+  }
+}
+```
+```js
+ // en.js
+ export default {
+   login: {
+    title: 'User Login',
+    loginBtn: 'Login',
+    usernameRule: 'Username is required',
+    passwordRule: 'Password cannot be less than 6 digits',
+    usernamePlaceholder: 'please enter your username',
+    passwordPlaceholder: 'please enter your password'
+  },
+}
+```
