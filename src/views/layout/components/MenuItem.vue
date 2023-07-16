@@ -8,7 +8,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
 import { generateTitle } from '@/utils/i18n'
 defineProps({
   title: {

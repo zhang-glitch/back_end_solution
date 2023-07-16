@@ -1,4 +1,5 @@
 import variables from '@/styles/variables.module.scss'
+import { generateColors } from '@/utils/theme'
 
 export default {
   token(state) {
@@ -8,8 +9,12 @@ export default {
     return state.user.userInfo
   },
   // scss变量
-  cssVar(state) {
-    return variables
+  cssVar(state, getters) {
+    return {
+      ...variables,
+      // 这里需要一些css变量的值
+      ...generateColors(getters.themeColor)
+    }
   },
   // 是否展开sidebar
   sideBarOpen(state) {
@@ -18,5 +23,9 @@ export default {
   // 国际化
   language(state) {
     return state.app.language
+  },
+  // 切换主题
+  themeColor(state) {
+    return state.app.themeColor
   }
 }

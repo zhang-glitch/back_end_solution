@@ -7,8 +7,13 @@
       <bread-crumb></bread-crumb>
     </div>
     <div class="right-wrapper">
+      <!-- 主题更换 -->
+      <theme-select class="right-wrapper-item"></theme-select>
       <!-- 国际化 -->
-      <language-select effect="dark"></language-select>
+      <language-select
+        effect="dark"
+        class="right-wrapper-item"
+      ></language-select>
       <!-- 头像菜单 -->
       <div class="avatar-menu">
         <el-dropdown trigger="click">
@@ -45,6 +50,7 @@ import { useStore } from 'vuex'
 import Hamburger from '@/components/hamburger/index.vue'
 import BreadCrumb from '@/components/bread-crumb/index.vue'
 import LanguageSelect from '@/components/language-select/index.vue'
+import ThemeSelect from '@/components/theme-select/index.vue'
 
 const store = useStore()
 const userInfo = computed(() => store.getters.userInfo)
@@ -82,8 +88,12 @@ export default {
     display: flex;
     align-items: center;
 
-    .language-select {
+    :deep .right-wrapper-item {
+      font-size: 24px;
       padding-right: 20px;
+      &:hover {
+        cursor: pointer;
+      }
     }
     .avatar-menu {
       .avatar {

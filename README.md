@@ -633,3 +633,151 @@ export default {
   },
 }
 ```
+## 主题切换
+了解了国际化，我们就来了解一下主题切换吧。他也是主要分为组件库的主题和我们自己内容的主题。
+
+对于组件库的主题切换，我们就直接修改他的css变量就行了。例如element-plus
+- 获取当前elemen-plus的所有样式。我们可以通过cdn进行获取当前版本的css文件
+```js
+async function getElementPlusStyles() {
+  const { version } = await import('element-plus/package.json')
+  const url = `https://unpkg.com/element-plus@${version}/dist/index.css`
+  const styles = await axios(url)
+  return styles.data
+}
+```
+- 找到我们想要替换的样式部分，通过正则完成替换。
+
+我们需要事先定义好，替换的颜色标志。（**根据element-plus提供的颜色值**）
+```js
+// element-plus 默认色值
+  const colorMap = {
+    '#3a8ee6': 'shade-1',
+    '#409eff': 'primary',
+    '#53a8ff': 'light-1',
+    '#66b1ff': 'light-2',
+    '#79bbff': 'light-3',
+    '#8cc5ff': 'light-4',
+    '#a0cfff': 'light-5',
+    '#b3d8ff': 'light-6',
+    '#c6e2ff': 'light-7',
+    '#d9ecff': 'light-8',
+    '#ecf5ff': 'light-9'
+  }
+```
+用正则替换掉获取到的css文本中的对应的颜色值为标记。例如（#3a8ee6 => shade-1）
+```js
+/**
+ * 将主题颜色对应的css值改成对应的关键标志
+ */
+
+async function generateElementPlusTemplate() {
+  // 获取elementplus样式表
+  let styles = await getElementPlusStyles()
+  // element-plus 默认色值
+  const colorMap = {
+    '#3a8ee6': 'shade-1',
+    '#409eff': 'primary',
+    '#53a8ff': 'light-1',
+    '#66b1ff': 'light-2',
+    '#79bbff': 'light-3',
+    '#8cc5ff': 'light-4',
+    '#a0cfff': 'light-5',
+    '#b3d8ff': 'light-6',
+    '#c6e2ff': 'light-7',
+    '#d9ecff': 'light-8',
+    '#ecf5ff': 'light-9'
+  }
+
+  Object.keys(colorMap).forEach((key) => {
+    // 将主题颜色替换成对应的标志。 例如（#3a8ee6 => shade-1）
+    styles = styles?.replace(new RegExp(key, 'ig'), colorMap[key])
+  })
+  return styles
+}
+```
+将styles文本中的标志替换成我们当前的主题色，在此之前，我们还需要处理一下根据当前主题色生成其他对应的辅色。
+
+这里需要使用到两个库来处理[`css-color-function`](https://www.npmjs.com/package/css-color-function)他是用来处理color()生成rgb颜色值，[`rgb-hex`](https://www.npmjs.com/package/rgb-hex)他是将rgb颜色转换成16进制颜色值。
+
+定义根据主色生成辅色对象
+```js
+//themeTemplate
+{
+  "shade-1": "color(primary shade(10%))",
+  "light-1": "color(primary tint(10%))",
+  "light-2": "color(primary tint(20%))",
+  "light-3": "color(primary tint(30%))",
+  "light-4": "color(primary tint(40%))",
+  "light-5": "color(primary tint(50%))",
+  "light-6": "color(primary tint(60%))",
+  "light-7": "color(primary tint(70%))",
+  "light-8": "color(primary tint(80%))",
+  "light-9": "color(primary tint(90%))",
+  "subMenuHover": "color(primary tint(70%))",
+  "subMenuBg": "color(primary tint(80%))",
+  "menuHover": "color(primary tint(90%))",
+  "menuBg": "color(primary)"
+}
+```
+
+```js
+/**
+ * @param {*} currentColor 当前主题色
+ * 更改color模板对应的color函数，根据传入的颜色值，将其转化成对应的16进制颜色值
+ */
+export function generateColors(currentColor) {
+  if (!currentColor) return
+  // 定义颜色模板对象
+  const colors = {
+    primary: currentColor
+  }
+
+  Object.keys(themeTemplate).forEach((key) => {
+    // 先将primary替换成对应的颜色值
+    const theme = themeTemplate[key].replace('primary', currentColor)
+    colors[key] = '#' + rgbHex(color.convert(theme))
+  })
+  return colors
+}
+```
+- 把替换后的样式写入到style标签中，利用样式优先级的特性代替固有样式。
+
+生成完毕后，我们就可以替换掉styles中的标志了。然后生成style再插入到head中。
+```js
+/**
+ *
+ * @param {*} currentColor 当前主题颜色
+ *  修改样式表模板,生成最终element-plus
+ */
+export async function generateStyleTemplate(currentColor) {
+  // 获取主题颜色模板对象
+  const colors = generateColors(currentColor)
+  // 获取当前styles模板
+  let styles = await generateElementPlusTemplate()
+  // 修改模板中对应位置的值
+  Object.keys(colors).forEach((key) => {
+    styles = styles.replace(
+      new RegExp('(:|\\s+)' + key, 'g'),
+      '$1' + colors[key]
+    )
+  })
+
+  return styles
+}
+
+/**
+ *
+ * @param {*} currentColor 当前主题颜色
+ * 将样式表插入到head中
+ */
+export async function insertStyleToPage(currentColor) {
+  const style = document.createElement('style')
+  style.innerText = await generateStyleTemplate(currentColor)
+  document.head.appendChild(style)
+}
+```
+
+对于第三方包主题，他是不可控的，我们需要拿到他编译后的css进行色值替换，利用style内部样式表优先级高于外部样式表的特性，来进行主题替换。
+
+对于自定义内容主题，我们只需要改变对应的css变量即可。在项目开发时，我们的menu菜单背景等，都是通过js变量的方式绑定到css中的。所以我们可以很轻松的改变js变量来达到css的变化。

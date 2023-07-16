@@ -51,12 +51,7 @@ const handleLanguageSelect = (lang) => {
 </script>
 
 <style scoped lang="scss">
-.language-select {
-  .language-icon {
-    font-size: 24px;
-  }
-  &:hover {
-    cursor: pointer;
-  }
+.el-dropdown {
+  font-size: inherit;
 }
 </style>

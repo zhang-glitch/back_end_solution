@@ -22,6 +22,7 @@ export default defineConfig({
     }
   },
   server: {
+    port: 8999,
     proxy: {
       '/api': {
         target: 'https://api.imooc-admin.lgdsunday.club/',
