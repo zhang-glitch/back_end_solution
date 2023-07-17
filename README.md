@@ -781,3 +781,248 @@ export async function insertStyleToPage(currentColor) {
 对于第三方包主题，他是不可控的，我们需要拿到他编译后的css进行色值替换，利用style内部样式表优先级高于外部样式表的特性，来进行主题替换。
 
 对于自定义内容主题，我们只需要改变对应的css变量即可。在项目开发时，我们的menu菜单背景等，都是通过js变量的方式绑定到css中的。所以我们可以很轻松的改变js变量来达到css的变化。
+## 全屏
+可以使用[`screenfull`](https://www.npmjs.com/package/screenfull)库去实现。通过`toggle`触发全屏，并监听他的change事件来监听全屏的切换更改展示图标。
+```js
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import screenfull from 'screenfull'
+
+const isFull = ref(false)
+const iconName = computed(() =>
+  isFull.value ? 'exit-fullscreen' : 'fullscreen'
+)
+
+// 监听变化
+const change = () => {
+  isFull.value = screenfull.isFullscreen
+}
+
+// 切换事件
+const handleClick = () => {
+  screenfull.toggle()
+}
+
+// 设置侦听器
+onMounted(() => {
+  screenfull.on('change', change)
+})
+
+// 删除侦听器
+onUnmounted(() => {
+  screenfull.off('change', change)
+})
+```
+## 搜索
+全局搜索功能在后台管理系统中是非常常见的，主要是让用户快速定位到目标。所以我们可以使用[fuse.js](https://www.fusejs.io/)库，来协助我们完成。
+
+由于fuse对收索的数据结构有特定要求，并结合当前我们的需求，搜索的关键字段需要是对象的直接属性。所以需要处理好数据。[这里是相关demo](https://www.fusejs.io/examples.html)
+
+处理数据
+```js
+/**
+ * 筛选出可供搜索的路由对象
+ * @param routes 路由表
+ * @param basePath 基础路径，默认为 /
+ * @param prefixTitle
+ */
+export const getFuseData = (routes, basePath = '/', prefixTitle = []) => {
+  // 创建 result 数据
+  let res = []
+  // 循环 routes 路由
+  for (const route of routes) {
+    // 创建包含 path 和 title 的 item
+    const data = {
+      path: route.path,
+      title: [...prefixTitle]
+    }
+    // 当前存在 meta 时，使用 i18n 解析国际化数据，组合成新的 title 内容
+    // 动态路由不允许被搜索
+    // 匹配动态路由的正则
+    const re = /.*\/:.*/
+    if (route.meta && route.meta.title && !re.exec(route.path)) {
+      const i18ntitle = i18n.global.t(`msg.route.${route.meta.title}`)
+      data.title = [...data.title, i18ntitle]
+      res.push(data)
+    }
+
+    // 存在 children 时，迭代调用
+    if (route.children) {
+      const tempRoutes = getFuseData(route.children, data.path, data.title)
+      if (tempRoutes.length >= 1) {
+        res = [...res, ...tempRoutes]
+      }
+    }
+  }
+  return res
+}
+```
+
+初始化fuse
+```js
+let fuse
+const initFuse = (searchPool) => {
+  fuse = new Fuse(searchPool, {
+    // 是否按优先级进行排序
+    shouldSort: true,
+    // 匹配长度超过这个值的才会被认为是匹配的
+    minMatchCharLength: 1,
+    // 将被搜索的键列表。 这支持嵌套路径、加权搜索、在字符串和对象数组中搜索。
+    // name：搜索的键
+    // weight：对应的权重
+    keys: [
+      {
+        name: 'title',
+        weight: 0.7
+      },
+      {
+        name: 'path',
+        weight: 0.3
+      }
+    ]
+  })
+}
+```
+然后调用`fuse.search(value)`方法并传入搜索关键字就行了。
+
+如果搜索数据需要做到国际化，**我们是事先在搜索代码中已经将对应的字段转化了**。所以在切换国际化时，将不会被改变。这时候我们需要监听国际化的切换，然后再重新初始化一下fuse的数据源。
+```js
+ watch(
+    () => store.getters.language,
+    () => {
+      // 处理数据
+      const generateStandardData = computed(() => {
+          // 获取搜索数据源
+          const originData = generateMenus(router.getRoutes())
+          // 处理成标准数据
+          return getFuseData(originData)
+      })
+      initFuse(generateStandardData.value)
+    }
+  )
+```
+
+这里需要注意一下，我们在搜索时，一般使用的是`select`组件，如element-plus中的select, 我们需要添加`remote`才可以将初始化的下拉字标去掉。然后绑定`remote-method`一个方法去处理搜索。
+## 自定义元素右键菜单
+通过web api [`contextMenu`](https://developer.mozilla.org/zh-CN/docs/Web/API/Element/contextmenu_event)去实现。
+
+在元素中绑定`contextMenu`事件。并控制菜单的展示和隐藏，菜单的位置。菜单是我们自定义的组件。
+```js
+@contextmenu.prevent="handleOpenMenu($event, index)"
+
+/**
+ * 鼠标右键,菜单展示
+ */
+const isMenu = ref(false)
+const currentTagIndex = ref(0)
+const menuStyle = reactive({
+  left: 0,
+  top: 0
+})
+const handleOpenMenu = (e, index) => {
+  const { x, y } = e
+  menuStyle.left = x + 'px'
+  menuStyle.top = y + 'px'
+  isMenu.value = true
+  currentTagIndex.value = index
+}
+```
+菜单组件。
+```js
+<template>
+  <ul class="mouse-menu">
+    <li @click="handleRefreshClick">
+      {{ $t('msg.tagsView.refresh') }}
+    </li>
+    <li @click="handleCloseRightClick">
+      {{ $t('msg.tagsView.closeRight') }}
+    </li>
+    <li @click="handleCloseOtherClick">
+      {{ $t('msg.tagsView.closeOther') }}
+    </li>
+  </ul>
+</template>
+
+<script setup>
+import { useStore } from 'vuex'
+
+const props = defineProps({
+  currentTagIndex: {
+    type: Number,
+    required: true
+  }
+})
+
+const emits = defineEmits('closeMenu')
+
+/**
+ * 刷新
+ */
+const handleRefreshClick = () => {
+  location.reload()
+  emits('closeMenu')
+}
+
+/**
+ * 关闭右侧
+ */
+const store = useStore()
+const handleCloseRightClick = () => {
+  store.commit('app/removeRightTags', props.currentTagIndex)
+  emits('closeMenu')
+}
+
+/**
+ * 关闭其他
+ */
+const handleCloseOtherClick = () => {
+  store.commit('app/removeOtherTags', props.currentTagIndex)
+  emits('closeMenu')
+}
+</script>
+
+<style scoped lang="scss">
+.mouse-menu {
+  position: fixed;
+  background: #fff;
+  z-index: 3000;
+  list-style-type: none;
+  padding: 5px 0;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #333;
+  box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
+  li {
+    margin: 0;
+    padding: 7px 16px;
+    cursor: pointer;
+    &:hover {
+      background: #eee;
+    }
+  }
+}
+</style>
+```
+**我们需要注意，在点击完菜单项时，菜单并不会关闭，所以我们需要自定义关闭事件，触发关闭。** 但是如果用户不点击菜单项，那么菜单也不会关闭，所以我们需要在菜单显示的时候，给body添加事件，让其关闭。
+```js
+const closeMenu = () => {
+  isMenu.value = false
+}
+
+/**
+ * 监听变化,没点击时，关闭menu
+ */
+watch(isMenu, (val) => {
+  if (val) {
+    document.body.addEventListener('click', closeMenu)
+  } else {
+    document.body.removeEventListener('click', closeMenu)
+  }
+})
+```
+
+## 动效切换错误
+
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd227728d6584d9ea1f27167ee7eabe3~tplv-k3u1fbpfcp-watermark.image?)
+
+在我们使用动效路由时，我们的路由组件不能是多个根标签。

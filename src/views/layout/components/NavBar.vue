@@ -7,6 +7,10 @@
       <bread-crumb></bread-crumb>
     </div>
     <div class="right-wrapper">
+      <!-- 搜索 -->
+      <header-search class="right-wrapper-item"></header-search>
+      <!-- 全屏展示 -->
+      <screen-full class="right-wrapper-item"></screen-full>
       <!-- 主题更换 -->
       <theme-select class="right-wrapper-item"></theme-select>
       <!-- 国际化 -->
@@ -42,6 +46,7 @@
       </div>
     </div>
   </div>
+  <view-tags></view-tags>
 </template>
 
 <script setup>
@@ -51,6 +56,9 @@ import Hamburger from '@/components/hamburger/index.vue'
 import BreadCrumb from '@/components/bread-crumb/index.vue'
 import LanguageSelect from '@/components/language-select/index.vue'
 import ThemeSelect from '@/components/theme-select/index.vue'
+import ScreenFull from '@/components/screen-full/index.vue'
+import HeaderSearch from '@/components/header-search/index.vue'
+import ViewTags from '@/components/view-tags/index.vue'
 
 const store = useStore()
 const userInfo = computed(() => store.getters.userInfo)
@@ -88,7 +96,7 @@ export default {
     display: flex;
     align-items: center;
 
-    :deep .right-wrapper-item {
+    :deep(.right-wrapper-item) {
       font-size: 24px;
       padding-right: 20px;
       &:hover {

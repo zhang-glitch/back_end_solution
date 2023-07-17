@@ -15,6 +15,13 @@ router.beforeEach(async (to, from, next) => {
       next('/')
     } else {
       if (!isCheckTimeout()) {
+        // 将数据加入到viewTags
+        // 进行去重
+        const tags = store.getters.viewTags
+        const findIndex = tags.findIndex((item) => to.path === item.path)
+        if (findIndex === -1 && to.path !== '/404' && to.path !== '/401') {
+          store.commit('app/setViewTags', [...tags, to])
+        }
         next()
         // return true
       } else {

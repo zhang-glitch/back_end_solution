@@ -27,5 +27,9 @@ export default {
   // 切换主题
   themeColor(state) {
     return state.app.themeColor
+  },
+  // viwTags
+  viewTags(state) {
+    return state.app.viewTags
   }
 }
