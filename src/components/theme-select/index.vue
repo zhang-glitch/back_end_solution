@@ -2,6 +2,7 @@
   <div class="theme-select">
     <el-tooltip :content="$t('msg.navBar.themeChange')">
       <svg-icon
+        id="guide-theme"
         icon="change-theme"
         class="theme-change-icon"
         @click="handleClick"

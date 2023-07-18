@@ -4,9 +4,11 @@
       <!-- 折叠按钮 -->
       <hamburger></hamburger>
       <!-- 面包屑 -->
-      <bread-crumb></bread-crumb>
+      <bread-crumb id="guide-breadcrumb"></bread-crumb>
     </div>
     <div class="right-wrapper">
+      <!-- 指导 -->
+      <guide class="right-wrapper-item"></guide>
       <!-- 搜索 -->
       <header-search class="right-wrapper-item"></header-search>
       <!-- 全屏展示 -->
@@ -59,6 +61,7 @@ import ThemeSelect from '@/components/theme-select/index.vue'
 import ScreenFull from '@/components/screen-full/index.vue'
 import HeaderSearch from '@/components/header-search/index.vue'
 import ViewTags from '@/components/view-tags/index.vue'
+import guide from '@/components/guide/index.vue'
 
 const store = useStore()
 const userInfo = computed(() => store.getters.userInfo)

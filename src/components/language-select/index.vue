@@ -4,7 +4,11 @@
       <!-- 这里需要包裹一层，不然会报错 -->
       <div>
         <el-tooltip :effect="effect" :content="$t('msg.navBar.lang')">
-          <svg-icon icon="language" class="language-icon"></svg-icon>
+          <svg-icon
+            id="guide-lang"
+            icon="language"
+            class="language-icon"
+          ></svg-icon>
         </el-tooltip>
       </div>
       <template #dropdown>

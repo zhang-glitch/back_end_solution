@@ -1,7 +1,11 @@
 <template>
   <div class="screen-full">
     <el-tooltip :content="$t('msg.navBar.screenfull')">
-      <svg-icon :icon="iconName" @click="handleClick"></svg-icon>
+      <svg-icon
+        id="guide-full"
+        :icon="iconName"
+        @click="handleClick"
+      ></svg-icon>
     </el-tooltip>
   </div>
 </template>

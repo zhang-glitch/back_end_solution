@@ -1,6 +1,7 @@
 <template>
   <div class="header-search">
     <svg-icon
+      id="guide-search"
       icon="search"
       @click.stop="handleClickSearch"
       class="search-icon"
