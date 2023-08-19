@@ -35,6 +35,11 @@ import { THEME_COLOR } from '@/constants'
 import { getItem } from '@/utils/storage'
 import { insertStyleToPage } from '@/utils/theme'
 
+// 设置inheritAttrs: false， 添加的class,style，等等非props属性都不会挂载到根标签上。
+defineOptions({
+  inheritAttrs: true
+})
+
 const dialogVisible = ref(false)
 /**
  * 点击展示dialog

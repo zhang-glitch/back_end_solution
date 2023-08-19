@@ -8,7 +8,7 @@ export default {
   userInfo(state) {
     return state.user.userInfo
   },
-  // scss变量
+  // scss变量, 这里就是修改自定义样式的主题的。当主题色发生变化，我们将重新计算附属主题变量的值
   cssVar(state, getters) {
     return {
       ...variables,

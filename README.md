@@ -1,3 +1,5 @@
+## 代码编写规范
+
 [vite 中配置 eslint](https://www.npmjs.com/package/vite-plugin-eslint?activeTab=readme)
 
 ```js
@@ -180,7 +182,7 @@ module.exports = {
   // 继承规则
   extends: ['@commitlint/config-conventional'],
   // 定义规则
-  roles: {
+  rules: {
     // type的类型定义: 表示git提交的type必须在以下类型范围之内
     'type-enum': [
       // 提交类型
@@ -232,10 +234,10 @@ prepare: 'husky install'
 添加 commitlint 的 hook 到 husky 中，并指令在 commit-msg 的 hooks 下执行`npx --no-install commitlint --edit "$1"`指令。
 
 ```js
-yarn husky add .husky/commmit-msg 'npx --no-install commitlint --edit "$1"'
+yarn husky add .husky/commit-msg 'npx --no-install commitlint --edit "$1"'
 ```
 
-![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/abfda282c1e5433c90c6123ac939f7ac~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/07415392dd564a6b965bb73138de4af9~tplv-k3u1fbpfcp-watermark.image?)
 
 可能有些人提交代码，代码并不是很规范(例如未配置代码保存时格式化)。所以我们需要监听提交的钩子函数，来做一些代码格式化工作。所以我们依旧是使用`husky`来监听 git hooks 触发，然后做一些校验工作。
 
@@ -251,7 +253,7 @@ yarn husky add .husky/pre-commit "npx eslint --ext .js,.vue src"
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f4e04ff4e2de44a6bec715e2e6277d75~tplv-k3u1fbpfcp-watermark.image?)
 
-上面这种方式只能提示代码处做的位置，**并且还会检查 src 目录下的所有代码，浪费大量时间。我们只需要检测修改后的代码文件即可。** 所以我们需要使用[`lint-staged`](https://github.com/okonet/lint-staged)只检查本次修改更新的代码，并在出现错误的时候，自动修复并推送。
+上面这种方式只能提示代码出错的位置，**并且还会检查 src 目录下的所有代码，浪费大量时间。我们只需要检测修改后的代码文件即可。** 所以我们需要使用[`lint-staged`](https://github.com/okonet/lint-staged)只检查本次修改更新的代码，并在出现错误的时候，自动修复并推送。
 
 ```js
 // package.json
@@ -267,6 +269,10 @@ yarn husky add .husky/pre-commit "npx eslint --ext .js,.vue src"
 ```
 
 然后将`.husky/pre-commit`文件下的`npx eslint --ext .js,.vue src`修改成`npx lint-staged`。
+
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f61a766330aa48cfa067a19bc65f6641~tplv-k3u1fbpfcp-watermark.image?)
+
+[案例代码](https://github.com/zhang-glitch/back_end_solution/tree/programming-specification)
 
 ## svg 图标使用
 
@@ -545,36 +551,57 @@ router // 开启路由，他会将item的index作为路由的path。
   </el-menu-item>
 </template>
 ```
-## el-dropdown中使用el-tooltip出现错误
+
+[案例代码](https://github.com/zhang-glitch/back_end_solution/tree/layout-design)
+
+## el-dropdown 中使用 el-tooltip 出现警告
 
 ![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8d66f0aba04c405eb87178d2576f29c6~tplv-k3u1fbpfcp-watermark.image?)
-需要将el-tooltip组件包裹一层。
+需要将 el-tooltip 组件包裹一层。
+
 ```js
-<!-- 这里需要包裹一层，不然会报错 -->
+ <el-dropdown @command="handleLanguageSelect" trigger="click">
+  <!-- 这里需要包裹一层，不然会报错 -->
   <div>
-    <el-tooltip :effect="effect" content="国际化">
-      <svg-icon icon="language"></svg-icon>
+    <el-tooltip :effect="effect" :content="$t('msg.navBar.lang')">
+      <svg-icon
+        id="guide-lang"
+        icon="language"
+        class="language-icon"
+      ></svg-icon>
     </el-tooltip>
   </div>
+  <template #dropdown>
+    <el-dropdown-menu>
+      <el-dropdown-item :disabled="language === 'zh'" command="zh">
+        中文
+      </el-dropdown-item>
+      <el-dropdown-item :disabled="language === 'en'" command="en">
+        English
+      </el-dropdown-item>
+    </el-dropdown-menu>
+  </template>
+</el-dropdown>
 ```
+
 ## 国际化
+
 对于国际化，我们需要处理两部分。一部分是组件库的国际化，一部分是我们自己文本的国际化。
 
-- 组件库国际化，我们可以使用对应组件库提供的api来完成。比如，element-plus。
+- 组件库国际化，我们可以使用对应组件库提供的 api 来完成。比如，element-plus。
+
 ```js
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import en from 'element-plus/lib/locale/lang/en'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
-
-app
-  .use(ElementPlus, {
-    locale: store.getters.language === 'zh' ? zhCn : en
-  })
+app.use(ElementPlus, {
+  locale: store.getters.language === 'zh' ? zhCn : en
+})
 ```
 
-- 自定义国际化。我们需要定义对应的语言包。就是将对应的文本事先编写多种对应的语言。然后使用[`vue-i18n`](https://www.npmjs.com/package/vue-i18n)来注册我们的语言包。
+- 自定义国际化。我们需要定义对应的语言包。就是将对应的文本事先编写多种对应的语言。然后使用[`vue-i18n`](https://vue-i18n.intlify.dev/guide/introduction.html)来注册我们的语言包。
 
 ```js
 import { createI18n } from 'vue-i18n'
@@ -606,7 +633,9 @@ const i18nInstance = createI18n({
 
 export default i18nInstance
 ```
+
 语言包
+
 ```js
 // zh.js
 export default {
@@ -620,24 +649,60 @@ export default {
   }
 }
 ```
+
 ```js
- // en.js
- export default {
-   login: {
+// en.js
+export default {
+  login: {
     title: 'User Login',
     loginBtn: 'Login',
     usernameRule: 'Username is required',
     passwordRule: 'Password cannot be less than 6 digits',
     usernamePlaceholder: 'please enter your username',
     passwordPlaceholder: 'please enter your password'
-  },
+  }
 }
 ```
+
+## v-bind 的最佳实践（多个组件使用相同的 css）
+
+对于多个组件都需要使用相同的 css 时，我们需要在每个组件根元素上绑定`v-bind='$attrs'`。然后只需要在使用该组件的父组件中设置对应的 class 即可将这些 class 加载对应的组件中，达到 css 复用的目的。
+
+**对于`class`而言，单一根元素，会被主动加在根元素上。** 多个根元素，我们就需要使用`v-bind="$attrs"`来指定具体绑定到哪个元素上了。
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/cad15ccc9b7c4fa1b5df724c92f84973~tplv-k3u1fbpfcp-watermark.image?)
+
+```js
+// right-wrapper-item 会挂载到对应组件的根组件上。
+ <!-- 主题更换 -->
+  <theme-select class="right-wrapper-item"></theme-select>
+  <!-- 国际化 -->
+  <language-select
+    effect="dark"
+    class="right-wrapper-item"
+  ></language-select>
+```
+
+如果不想让其挂载到根标签，我们需要设置`inheritAttrs: false`，来阻止这种默认行为。 **不管`inheritAttrs`设置成`true`还是`false`，都可以通过`attrs`获取到全部的非 props。包括`class, style`。**
+
+```js
+// 设置inheritAttrs: false， 添加的class,style，等等非props属性都不会挂载到根标签上。
+defineOptions({
+  inheritAttrs: false
+})
+
+const attrs = useAttrs()
+console.log(attrs)
+```
+
 ## 主题切换
+
 了解了国际化，我们就来了解一下主题切换吧。他也是主要分为组件库的主题和我们自己内容的主题。
 
-对于组件库的主题切换，我们就直接修改他的css变量就行了。例如element-plus
-- 获取当前elemen-plus的所有样式。我们可以通过cdn进行获取当前版本的css文件
+对于组件库的主题切换，我们就直接修改他的 css 变量就行了。例如 element-plus
+
+- 获取当前 elemen-plus 的所有样式。我们可以通过 cdn 进行获取当前版本的 css 文件
+
 ```js
 async function getElementPlusStyles() {
   const { version } = await import('element-plus/package.json')
@@ -646,26 +711,30 @@ async function getElementPlusStyles() {
   return styles.data
 }
 ```
+
 - 找到我们想要替换的样式部分，通过正则完成替换。
 
-我们需要事先定义好，替换的颜色标志。（**根据element-plus提供的颜色值**）
+我们需要事先定义好，替换的颜色标志。（**根据 element-plus 提供的颜色值**）
+
 ```js
 // element-plus 默认色值
-  const colorMap = {
-    '#3a8ee6': 'shade-1',
-    '#409eff': 'primary',
-    '#53a8ff': 'light-1',
-    '#66b1ff': 'light-2',
-    '#79bbff': 'light-3',
-    '#8cc5ff': 'light-4',
-    '#a0cfff': 'light-5',
-    '#b3d8ff': 'light-6',
-    '#c6e2ff': 'light-7',
-    '#d9ecff': 'light-8',
-    '#ecf5ff': 'light-9'
-  }
+const colorMap = {
+  '#3a8ee6': 'shade-1',
+  '#409eff': 'primary',
+  '#53a8ff': 'light-1',
+  '#66b1ff': 'light-2',
+  '#79bbff': 'light-3',
+  '#8cc5ff': 'light-4',
+  '#a0cfff': 'light-5',
+  '#b3d8ff': 'light-6',
+  '#c6e2ff': 'light-7',
+  '#d9ecff': 'light-8',
+  '#ecf5ff': 'light-9'
+}
 ```
-用正则替换掉获取到的css文本中的对应的颜色值为标记。例如（#3a8ee6 => shade-1）
+
+用正则替换掉获取到的 css 文本中的对应的颜色值为标记。例如（#3a8ee6 => shade-1）
+
 ```js
 /**
  * 将主题颜色对应的css值改成对应的关键标志
@@ -696,11 +765,13 @@ async function generateElementPlusTemplate() {
   return styles
 }
 ```
-将styles文本中的标志替换成我们当前的主题色，在此之前，我们还需要处理一下根据当前主题色生成其他对应的辅色。
 
-这里需要使用到两个库来处理[`css-color-function`](https://www.npmjs.com/package/css-color-function)他是用来处理color()生成rgb颜色值，[`rgb-hex`](https://www.npmjs.com/package/rgb-hex)他是将rgb颜色转换成16进制颜色值。
+将 styles 文本中的标志替换成我们当前的主题色，在此之前，我们还需要处理一下根据当前主题色生成其他对应的辅色。
+
+这里需要使用到两个库来处理[`css-color-function`](https://www.npmjs.com/package/css-color-function)他是用来处理 color()生成 rgb 颜色值，[`rgb-hex`](https://www.npmjs.com/package/rgb-hex)他是将 rgb 颜色转换成 16 进制颜色值。
 
 定义根据主色生成辅色对象
+
 ```js
 //themeTemplate
 {
@@ -741,9 +812,11 @@ export function generateColors(currentColor) {
   return colors
 }
 ```
-- 把替换后的样式写入到style标签中，利用样式优先级的特性代替固有样式。
 
-生成完毕后，我们就可以替换掉styles中的标志了。然后生成style再插入到head中。
+- 把替换后的样式写入到 style 标签中，利用样式优先级的特性代替固有样式。
+
+生成完毕后，我们就可以替换掉 styles 中的标志了。然后生成 style 再插入到 head 中。
+
 ```js
 /**
  *
@@ -778,11 +851,29 @@ export async function insertStyleToPage(currentColor) {
 }
 ```
 
-对于第三方包主题，他是不可控的，我们需要拿到他编译后的css进行色值替换，利用style内部样式表优先级高于外部样式表的特性，来进行主题替换。
+对于第三方包主题，他是不可控的，我们需要拿到他编译后的 css 进行色值替换，利用 style 内部样式表优先级高于外部样式表的特性，来进行主题替换。
 
-对于自定义内容主题，我们只需要改变对应的css变量即可。在项目开发时，我们的menu菜单背景等，都是通过js变量的方式绑定到css中的。所以我们可以很轻松的改变js变量来达到css的变化。
+对于自定义内容主题，我们只需要改变对应的 css 变量即可。在项目开发时，我们的 menu 菜单背景等，都是通过 js 变量的方式绑定到 css 中的。所以我们可以很轻松的改变 js 变量来达到 css 的变化。
+
+比如在 vuex 中设置 getters，当主题色发生变化，该 getters 就会重新计算，然后就会得到新的颜色变量并赋值。
+
+```js
+ // scss变量, 这里就是修改自定义样式的主题的。当主题色发生变化，我们将重新计算附属主题变量的值
+  cssVar(state, getters) {
+    return {
+      ...variables,
+      // 这里需要一些css变量的值
+      ...generateColors(getters.themeColor)
+    }
+  },
+```
+
+[案例代码](https://github.com/zhang-glitch/back_end_solution/tree/change-theme)
+
 ## 全屏
-可以使用[`screenfull`](https://www.npmjs.com/package/screenfull)库去实现。通过`toggle`触发全屏，并监听他的change事件来监听全屏的切换更改展示图标。
+
+可以使用[`screenfull`](https://www.npmjs.com/package/screenfull)库去实现。通过`toggle`触发全屏，并监听他的 change 事件来监听全屏的切换更改展示图标。
+
 ```js
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import screenfull from 'screenfull'
@@ -812,12 +903,17 @@ onUnmounted(() => {
   screenfull.off('change', change)
 })
 ```
+
+[案例代码](https://github.com/zhang-glitch/back_end_solution/)
+
 ## 搜索
+
 全局搜索功能在后台管理系统中是非常常见的，主要是让用户快速定位到目标。所以我们可以使用[fuse.js](https://www.fusejs.io/)库，来协助我们完成。
 
-由于fuse对收索的数据结构有特定要求，并结合当前我们的需求，搜索的关键字段需要是对象的直接属性。所以需要处理好数据。[这里是相关demo](https://www.fusejs.io/examples.html)
+由于 fuse 对收索的数据结构有特定要求，并结合当前我们的需求，搜索的关键字段需要是对象的直接属性。所以需要处理好数据。[这里是相关 demo](https://www.fusejs.io/examples.html)
 
 处理数据
+
 ```js
 /**
  * 筛选出可供搜索的路由对象
@@ -857,7 +953,8 @@ export const getFuseData = (routes, basePath = '/', prefixTitle = []) => {
 }
 ```
 
-初始化fuse
+初始化 fuse
+
 ```js
 let fuse
 const initFuse = (searchPool) => {
@@ -881,33 +978,48 @@ const initFuse = (searchPool) => {
     ]
   })
 }
-```
-然后调用`fuse.search(value)`方法并传入搜索关键字就行了。
 
-如果搜索数据需要做到国际化，**我们是事先在搜索代码中已经将对应的字段转化了**。所以在切换国际化时，将不会被改变。这时候我们需要监听国际化的切换，然后再重新初始化一下fuse的数据源。
+// 处理搜索数据源，并初始化fuse
+initFuse(generateStandardData.value)
+```
+
+然后调用`fuse.search(value)`方法并传入搜索关键字就可以得到搜索列表了。
+
+如果搜索数据需要做到国际化，**我们是事先在搜索代码中已经将对应的字段转化了**。所以在切换国际化时，将不会被改变。这时候我们需要监听国际化的切换，然后再重新初始化一下 fuse 的数据源。
+
 ```js
- watch(
-    () => store.getters.language,
-    () => {
-      // 处理数据
-      const generateStandardData = computed(() => {
-          // 获取搜索数据源
-          const originData = generateMenus(router.getRoutes())
-          // 处理成标准数据
-          return getFuseData(originData)
-      })
-      initFuse(generateStandardData.value)
-    }
-  )
+watch(
+  () => store.getters.language,
+  () => {
+    // 处理数据
+    const generateStandardData = computed(() => {
+      // 获取搜索数据源
+      const originData = generateMenus(router.getRoutes())
+      // 处理成标准数据
+      return getFuseData(originData)
+    })
+    initFuse(generateStandardData.value)
+  }
+)
 ```
 
-这里需要注意一下，我们在搜索时，一般使用的是`select`组件，如element-plus中的select, 我们需要添加`remote`才可以将初始化的下拉字标去掉。然后绑定`remote-method`一个方法去处理搜索。
+这里需要注意一下，我们在搜索时，一般使用的是`select`组件，如 element-plus 中的 select, 我们需要添加`remote`才可以将初始化的下拉字标去掉。然后绑定`remote-method`一个方法去处理搜索。
+
+[案例代码](https://github.com/zhang-glitch/back_end_solution/)
+
 ## 自定义元素右键菜单
-通过web api [`contextMenu`](https://developer.mozilla.org/zh-CN/docs/Web/API/Element/contextmenu_event)去实现。
+
+通过 web api [`contextMenu`](https://developer.mozilla.org/zh-CN/docs/Web/API/Element/contextmenu_event)去实现。
 
 在元素中绑定`contextMenu`事件。并控制菜单的展示和隐藏，菜单的位置。菜单是我们自定义的组件。
+
 ```js
-@contextmenu.prevent="handleOpenMenu($event, index)"
+<mouse-menu
+  v-show="isMenu"
+  :style="menuStyle"
+  :currentTagIndex="currentTagIndex"
+  @close-menu="handleCloseMenu"
+></mouse-menu>
 
 /**
  * 鼠标右键,菜单展示
@@ -926,8 +1038,11 @@ const handleOpenMenu = (e, index) => {
   currentTagIndex.value = index
 }
 ```
+
 菜单组件。
+
 ```js
+// mouse-menu
 <template>
   <ul class="mouse-menu">
     <li @click="handleRefreshClick">
@@ -1003,7 +1118,9 @@ const handleCloseOtherClick = () => {
 }
 </style>
 ```
-**我们需要注意，在点击完菜单项时，菜单并不会关闭，所以我们需要自定义关闭事件，触发关闭。** 但是如果用户不点击菜单项，那么菜单也不会关闭，所以我们需要在菜单显示的时候，给body添加事件，让其关闭。
+
+**我们需要注意，在点击完菜单项时，菜单并不会关闭，所以我们需要自定义关闭事件，触发关闭。** 但是如果用户不点击菜单项，那么菜单也不会关闭，所以我们需要在菜单显示的时候，给 body 添加事件，让其关闭。
+
 ```js
 const closeMenu = () => {
   isMenu.value = false
@@ -1021,8 +1138,22 @@ watch(isMenu, (val) => {
 })
 ```
 
-## 动效切换错误
+[案例代码](https://github.com/zhang-glitch/back_end_solution/)
+
+## 路由动效切换错误
+
+[路由过度动效](https://router.vuejs.org/zh/guide/advanced/transitions.html)
+
+```js
+<router-view v-slot="{ Component, route }">
+  <transition name="fade" mode="out-in">
+    <keep-alive>
+      <component :is="Component" :key="route.path"></component>
+    </keep-alive>
+  </transition>
+</router-view>
+```
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd227728d6584d9ea1f27167ee7eabe3~tplv-k3u1fbpfcp-watermark.image?)
 
-在我们使用动效路由时，我们的路由组件不能是多个根标签。
+**在我们使用动效路由时，我们的路由组件不能是多个根标签。** 不然会报警告不显示内容。

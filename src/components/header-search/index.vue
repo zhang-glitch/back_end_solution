@@ -61,7 +61,6 @@ const router = useRouter()
 const generateStandardData = computed(() => {
   // 获取搜索数据源
   const originData = generateMenus(router.getRoutes())
-  console.log('getFuseData(originData)', getFuseData(originData))
   return getFuseData(originData)
 })
 
