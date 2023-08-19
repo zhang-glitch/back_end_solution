@@ -1,5 +1,7 @@
 ## 代码编写规范
-[vite中配置eslint](https://www.npmjs.com/package/vite-plugin-eslint?activeTab=readme)
+
+[vite 中配置 eslint](https://www.npmjs.com/package/vite-plugin-eslint?activeTab=readme)
+
 ```js
 yarn add eslint vite-plugin-eslint eslint-plugin-vue standard -D
 ```
@@ -7,9 +9,10 @@ yarn add eslint vite-plugin-eslint eslint-plugin-vue standard -D
 执行`npx eslint --init`生成配置文件。
 ![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ddb52c9057174d0293bdfed730e7516d~tplv-k3u1fbpfcp-watermark.image?)
 
-**注意：vscode的eslint插件只能给出格式错误提示和自动格式化。而不是安装了插件就可以有格式提示。还需要我们在开发的时候安装对应的eslint包，配置是否开启对应的格式检查。从而配合vscode的插件。**
+**注意：vscode 的 eslint 插件只能给出格式错误提示和自动格式化。而不是安装了插件就可以有格式提示。还需要我们在开发的时候安装对应的 eslint 包，配置是否开启对应的格式检查。从而配合 vscode 的插件。**
 
-他一般和prettier代码格式化工具配合使用。并结合vscode prettier code formatter插件来达到格式化代码的效果（保存代码时）
+他一般和 prettier 代码格式化工具配合使用。并结合 vscode prettier code formatter 插件来达到格式化代码的效果（保存代码时）
+
 ```js
 // .prettierrc
 {
@@ -26,26 +29,31 @@ yarn add eslint vite-plugin-eslint eslint-plugin-vue standard -D
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6845d43b6fe34677a9cac473bb762015~tplv-k3u1fbpfcp-watermark.image?)
 
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6b6052b7fedd4032b1333467e1207ee5~tplv-k3u1fbpfcp-watermark.image?)
-## git提交规范
 
-一般都会遵循angular团队的提交规范。
+## git 提交规范
+
+一般都会遵循 angular 团队的提交规范。
 
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c59e87042ae84e8cb160d7a0993875a5~tplv-k3u1fbpfcp-watermark.image?)
 
 如果我们提交代码时自己去遵循这种规范，那将是很痛苦的。所以我们需要工具来代替我们完成。
 
-commitizen，他表示当我们使用commitizen进行代码提交（git commit）时, commitizen会提交你在提交时填写的所有必须的提交字段。
+commitizen，他表示当我们使用 commitizen 进行代码提交（git commit）时, commitizen 会提交你在提交时填写的所有必须的提交字段。
 
 下面我们来看其具体使用。
 
-全局安装commitizen
+全局安装 commitizen
+
 ```js
 yarn add commitizen -g
 ```
-安装并配置cz-customizable插件。
+
+安装并配置 cz-customizable 插件。
+
 ```js
 yarn add cz-customizable -D
 ```
+
 ```js
 // package.json
  "config": {
@@ -54,7 +62,9 @@ yarn add cz-customizable -D
     }
   }
 ```
-项目根目录下创建`.cz-config.js`自定义提示文件。并且将package.json中的type改成commonjs。
+
+项目根目录下创建`.cz-config.js`自定义提示文件。并且将 package.json 中的 type 改成 commonjs。
+
 ```js
 module.exports = {
   //  可选类型
@@ -156,14 +166,16 @@ module.exports = {
 //   // askForBreakingChangeFirst : true, // default is false
 // };
 ```
+
 但是这样只是在使用`git cz`的情况下才可以做到规范化提交。但是还是可以使用`git commit`来提交的。所以我们要杜绝使用`git commit`直接进行**不规范的**提交。
 
 可以使用[`commitlint`](https://github.com/conventionalcommit/commitlint)来达到效果。**主要的目的是检测提交信息的规范性。**
+
 ```js
 yarn add @commitlint/config-conventional @commitlint/cli -D
 ```
 
-在根目录创建commitlint.config.js文件，配置commitlint
+在根目录创建 commitlint.config.js 文件，配置 commitlint
 
 ```js
 module.exports = {
@@ -197,32 +209,40 @@ module.exports = {
   }
 }
 ```
-**有了commitlint配置，我们还需要执行在什么时机触发git消息提交检验，所以需要使用[`husky`](https://github.com/typicode/husky)来完成。** 主要是监听`commit-msg`钩子来校验其规范性。
- 
-**husky是一个git hook工具，可以帮助我们触发git提交的各个阶段：pre-commit、commit-msg、pre-push。**
+
+**有了 commitlint 配置，我们还需要执行在什么时机触发 git 消息提交检验，所以需要使用[`husky`](https://github.com/typicode/husky)来完成。** 主要是监听`commit-msg`钩子来校验其规范性。
+
+**husky 是一个 git hook 工具，可以帮助我们触发 git 提交的各个阶段：pre-commit、commit-msg、pre-push。**
+
 ```js
 yarn add husky -D
 ```
-启动husky，生成.husky文件夹
+
+启动 husky，生成.husky 文件夹
+
 ```js
 yarn husky install
 ```
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8ef9e681fcaf485eaaa50955ca6c9e86~tplv-k3u1fbpfcp-watermark.image?)
-在package中配置指令。
+在 package 中配置指令。
+
 ```js
-prepare: "husky install"
+prepare: 'husky install'
 ```
-添加 commitlint的hook到husky中，并指令在commit-msg的hooks下执行`npx --no-install commitlint --edit "$1"`指令。
+
+添加 commitlint 的 hook 到 husky 中，并指令在 commit-msg 的 hooks 下执行`npx --no-install commitlint --edit "$1"`指令。
+
 ```js
 yarn husky add .husky/commit-msg 'npx --no-install commitlint --edit "$1"'
 ```
 
 ![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/07415392dd564a6b965bb73138de4af9~tplv-k3u1fbpfcp-watermark.image?)
 
-可能有些人提交代码，代码并不是很规范(例如未配置代码保存时格式化)。所以我们需要监听提交的钩子函数，来做一些代码格式化工作。所以我们依旧是使用`husky`来监听git hooks触发，然后做一些校验工作。
+可能有些人提交代码，代码并不是很规范(例如未配置代码保存时格式化)。所以我们需要监听提交的钩子函数，来做一些代码格式化工作。所以我们依旧是使用`husky`来监听 git hooks 触发，然后做一些校验工作。
 
 **所以需要监听`pre-commit`钩子来对代码进行格式化。**
+
 ```js
 yarn husky add .husky/pre-commit "npx eslint --ext .js,.vue src"
 ```
@@ -233,7 +253,8 @@ yarn husky add .husky/pre-commit "npx eslint --ext .js,.vue src"
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f4e04ff4e2de44a6bec715e2e6277d75~tplv-k3u1fbpfcp-watermark.image?)
 
-上面这种方式只能提示代码出错的位置，**并且还会检查src目录下的所有代码，浪费大量时间。我们只需要检测修改后的代码文件即可。** 所以我们需要使用[`lint-staged`](https://github.com/okonet/lint-staged)只检查本次修改更新的代码，并在出现错误的时候，自动修复并推送。
+上面这种方式只能提示代码出错的位置，**并且还会检查 src 目录下的所有代码，浪费大量时间。我们只需要检测修改后的代码文件即可。** 所以我们需要使用[`lint-staged`](https://github.com/okonet/lint-staged)只检查本次修改更新的代码，并在出现错误的时候，自动修复并推送。
+
 ```js
 // package.json
 "gitHooks": {
@@ -246,32 +267,37 @@ yarn husky add .husky/pre-commit "npx eslint --ext .js,.vue src"
     ]
   }
 ```
-然后将`.husky/pre-commit`文件下的`npx eslint --ext .js,.vue src`修改成`npx lint-staged`。
 
+然后将`.husky/pre-commit`文件下的`npx eslint --ext .js,.vue src`修改成`npx lint-staged`。
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f61a766330aa48cfa067a19bc65f6641~tplv-k3u1fbpfcp-watermark.image?)
 
 [案例代码](https://github.com/zhang-glitch/back_end_solution/tree/programming-specification)
-## svg图标使用
-一般项目中，我们会使用到组件库提供的svg图标，如果不能满足条件，我们也会使用自定义的svg图标，那么如何使用呢？我们将对svg图标的使用封装成一个通用的组件。
 
-在webpack中实现svg图标注册。使用[`require.context()`](https://webpack.docschina.org/guides/dependency-management/#requirecontext)来引入指定文件夹下的所有svg图标。
+## svg 图标使用
+
+一般项目中，我们会使用到组件库提供的 svg 图标，如果不能满足条件，我们也会使用自定义的 svg 图标，那么如何使用呢？我们将对 svg 图标的使用封装成一个通用的组件。
+
+在 webpack 中实现 svg 图标注册。使用[`require.context()`](https://webpack.docschina.org/guides/dependency-management/#requirecontext)来引入指定文件夹下的所有 svg 图标。
+
 ```js
 import SvgIcon from '@/components/SvgIcon'
 
-// 
+//
 // 通过 require.context() 函数来创建自己的 context
 const svgRequire = require.context('./svg', false, /\.svg$/)
 // 此时返回一个 require 的函数，可以接受一个 request 的参数，用于 require 的导入。
 // 该函数提供了三个属性，可以通过 require.keys() 获取到所有的 svg 图标
 // 遍历图标，把图标作为 request 传入到 require 导入函数中，完成本地 svg 图标的导入
-svgRequire.keys().forEach(svgIcon => svgRequire(svgIcon))
+svgRequire.keys().forEach((svgIcon) => svgRequire(svgIcon))
 
-export default app => {
+export default (app) => {
   app.component('svg-icon', SvgIcon)
 }
 ```
-并且需要使用[`svg-sprite-loader`](https://github.com/JetBrains/svg-sprite-loader)插件来协助我们显示svg图标。
+
+并且需要使用[`svg-sprite-loader`](https://github.com/JetBrains/svg-sprite-loader)插件来协助我们显示 svg 图标。
+
 ```js
 const path = require('path')
 function resolve(dir) {
@@ -295,14 +321,19 @@ module.exports = {
   }
 }
 ```
-但是在vite中，我们可以通过插件完成，[具体看这里](https://juejin.cn/post/7251878440327512124#heading-10)
-## element-plus表单验证要素
-- el-form 指定model,rules字段。
-- el-form-item 指定prop字段。
+
+但是在 vite 中，我们可以通过插件完成，[具体看这里](https://juejin.cn/post/7251878440327512124#heading-10)
+
+## element-plus 表单验证要素
+
+- el-form 指定 model,rules 字段。
+- el-form-item 指定 prop 字段。
 
 并且可以通过`validator`来自定义校验规则。[具体参考这里](https://element-plus.org/zh-CN/component/form.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%A0%A1%E9%AA%8C%E8%A7%84%E5%88%99)
+
 ## 接口设计
-对于接口的设计，如果可以参入后端设计，最好让后端都返回一个标识，来表示当前请求是否成功，方便我们在拦截器中做message提示。
+
+对于接口的设计，如果可以参入后端设计，最好让后端都返回一个标识，来表示当前请求是否成功，方便我们在拦截器中做 message 提示。
 
 ```js
 // 响应拦截器
@@ -334,9 +365,10 @@ service.interceptors.response.use(
   }
 )
 ```
-在响应拦截器统一处理message提示。让我们在页面逻辑中不需要在过多的判断，来处理message消息。
 
-我们注意到上面出现错误，我们将返回一个error promise。所以如果在页面中我们想要控制加载的状态。我们可以通过try catch来捕获错误。无论成功还是失败，都关闭加载状态。
+在响应拦截器统一处理 message 提示。让我们在页面逻辑中不需要在过多的判断，来处理 message 消息。
+
+我们注意到上面出现错误，我们将返回一个 error promise。所以如果在页面中我们想要控制加载的状态。我们可以通过 try catch 来捕获错误。无论成功还是失败，都关闭加载状态。
 
 ```js
 const store = useStore()
@@ -355,19 +387,25 @@ const handleLogin = async () => {
   }
 }
 ```
+
 ## 退出登录
+
 - 清除当前用户缓存的数据
 - 清除掉权限相关的配置
 - 返回登录页面
 
 主动退出和被动退出
+
 - 主动退出：用户点击退出按钮
-- 被动退出：token失效或者单点登录。（**这些都是后端判断完毕，返回不同的状态码，前端在拦截器中处理一下就行。**）
+- 被动退出：token 失效或者单点登录。（**这些都是后端判断完毕，返回不同的状态码，前端在拦截器中处理一下就行。**）
 
 ### 被动退出，主动处理
-在前端判断token是否过期，过期后，直接退出。
-- 登录成功后，我们保存一个时间戳在localStorage中。
-- 设置一个过期时间，每次请求判断当前token是否在过期时间段内。
+
+在前端判断 token 是否过期，过期后，直接退出。
+
+- 登录成功后，我们保存一个时间戳在 localStorage 中。
+- 设置一个过期时间，每次请求判断当前 token 是否在过期时间段内。
+
 ```js
 /**
  * 获取时间戳
@@ -392,8 +430,11 @@ export function isCheckTimeout() {
   return currentTime - timeStamp > TOKEN_TIMEOUT_VALUE
 }
 ```
-## vite中js使用scss变量
-文件命名`...module.scss`。以`module.scss`为后缀。然后通过`:export`进行导出，即可在js中导入直接使用。[具体可查看这里](https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass)
+
+## vite 中 js 使用 scss 变量
+
+文件命名`...module.scss`。以`module.scss`为后缀。然后通过`:export`进行导出，即可在 js 中导入直接使用。[具体可查看这里](https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass)
+
 ```js
 // sidebar
 $menuText: #bfcbd9;
@@ -426,10 +467,13 @@ $sideBarDuration: 0.28s;
   tagViewsList:#42b983;
 }
 ```
+
 ## 菜单列表处理
+
 一般情况下，我们都会通过当前用户的路由列表来获取到对应的菜单列表。所以我们就需要去处理一些路由列表。
 
 获取路由表
+
 - [`router.options.routes`](https://router.vuejs.org/zh/api/interfaces/RouterOptions.html#Properties-routes): 获取初始路由表 （新增的路由表无法获取到）
 - [`router.getRoutes()`](https://router.vuejs.org/zh/api/interfaces/Router.html#Methods-getRoutes): 获取所有路由列表。**并且可以获取父级路由和子级路由。**
 
@@ -451,7 +495,9 @@ function getRouteChildren(routes) {
   return _routes
 }
 ```
+
 过滤二级路由，因为我们菜单列表展示的和我们路由列表的结构是一样的。所以我们需要将二级路由过滤掉。
+
 ```js
 /**
  * 过滤重复路由
@@ -464,9 +510,11 @@ export function filterRoutes(routes) {
   })
 }
 ```
-然后就是处理那些路由是在菜单栏中可见的。这个需要根据你们的逻辑来判断。主要就是递归处理route.children中的路由而已。
 
-下面来介绍menu组件的一些属性
+然后就是处理那些路由是在菜单栏中可见的。这个需要根据你们的逻辑来判断。主要就是递归处理 route.children 中的路由而已。
+
+下面来介绍 menu 组件的一些属性
+
 ```js
 :collapse // 是否·折叠菜单
 :default-active // 当前选中的菜单，这个和每个item的index的值相匹配。一般我们会使用path来作为index的值。
@@ -477,7 +525,9 @@ export function filterRoutes(routes) {
 :collapse-transition // 是否使用折叠动画·
 router // 开启路由，他会将item的index作为路由的path。
 ```
+
 在设计菜单组件的时候，我们需要将子菜单封装成一个·组件，这样便于我们处理嵌套菜单。
+
 ```js
 <template>
   <!-- 判断是否直接展示menu-item还是submenu-item -->
@@ -501,11 +551,14 @@ router // 开启路由，他会将item的index作为路由的path。
   </el-menu-item>
 </template>
 ```
+
 [案例代码](https://github.com/zhang-glitch/back_end_solution/tree/layout-design)
-## el-dropdown中使用el-tooltip出现警告
+
+## el-dropdown 中使用 el-tooltip 出现警告
 
 ![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8d66f0aba04c405eb87178d2576f29c6~tplv-k3u1fbpfcp-watermark.image?)
-需要将el-tooltip组件包裹一层。
+需要将 el-tooltip 组件包裹一层。
+
 ```js
  <el-dropdown @command="handleLanguageSelect" trigger="click">
   <!-- 这里需要包裹一层，不然会报错 -->
@@ -530,21 +583,22 @@ router // 开启路由，他会将item的index作为路由的path。
   </template>
 </el-dropdown>
 ```
+
 ## 国际化
+
 对于国际化，我们需要处理两部分。一部分是组件库的国际化，一部分是我们自己文本的国际化。
 
-- 组件库国际化，我们可以使用对应组件库提供的api来完成。比如，element-plus。
+- 组件库国际化，我们可以使用对应组件库提供的 api 来完成。比如，element-plus。
+
 ```js
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import en from 'element-plus/lib/locale/lang/en'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
-
-app
-  .use(ElementPlus, {
-    locale: store.getters.language === 'zh' ? zhCn : en
-  })
+app.use(ElementPlus, {
+  locale: store.getters.language === 'zh' ? zhCn : en
+})
 ```
 
 - 自定义国际化。我们需要定义对应的语言包。就是将对应的文本事先编写多种对应的语言。然后使用[`vue-i18n`](https://vue-i18n.intlify.dev/guide/introduction.html)来注册我们的语言包。
@@ -579,7 +633,9 @@ const i18nInstance = createI18n({
 
 export default i18nInstance
 ```
+
 语言包
+
 ```js
 // zh.js
 export default {
@@ -593,21 +649,24 @@ export default {
   }
 }
 ```
+
 ```js
- // en.js
- export default {
-   login: {
+// en.js
+export default {
+  login: {
     title: 'User Login',
     loginBtn: 'Login',
     usernameRule: 'Username is required',
     passwordRule: 'Password cannot be less than 6 digits',
     usernamePlaceholder: 'please enter your username',
     passwordPlaceholder: 'please enter your password'
-  },
+  }
 }
 ```
-## v-bind的最佳实践（多个组件使用相同的css）
-对于多个组件都需要使用相同的css时，我们需要在每个组件根元素上绑定`v-bind='$attrs'`。然后只需要在使用该组件的父组件中设置对应的class即可将这些class加载对应的组件中，达到css复用的目的。
+
+## v-bind 的最佳实践（多个组件使用相同的 css）
+
+对于多个组件都需要使用相同的 css 时，我们需要在每个组件根元素上绑定`v-bind='$attrs'`。然后只需要在使用该组件的父组件中设置对应的 class 即可将这些 class 加载对应的组件中，达到 css 复用的目的。
 
 **对于`class`而言，单一根元素，会被主动加在根元素上。** 多个根元素，我们就需要使用`v-bind="$attrs"`来指定具体绑定到哪个元素上了。
 
@@ -623,21 +682,27 @@ export default {
     class="right-wrapper-item"
   ></language-select>
 ```
-如果不想让其挂载到根标签，我们需要设置`inheritAttrs: false`，来阻止这种默认行为。 **不管`inheritAttrs`设置成`true`还是`false`，都可以通过`attrs`获取到全部的非props。包括`class, style`。**
-```js
-    // 设置inheritAttrs: false， 添加的class,style，等等非props属性都不会挂载到根标签上。
-    defineOptions({
-      inheritAttrs: false
-    })
 
-    const attrs = useAttrs()
-    console.log(attrs)
+如果不想让其挂载到根标签，我们需要设置`inheritAttrs: false`，来阻止这种默认行为。 **不管`inheritAttrs`设置成`true`还是`false`，都可以通过`attrs`获取到全部的非 props。包括`class, style`。**
+
+```js
+// 设置inheritAttrs: false， 添加的class,style，等等非props属性都不会挂载到根标签上。
+defineOptions({
+  inheritAttrs: false
+})
+
+const attrs = useAttrs()
+console.log(attrs)
 ```
+
 ## 主题切换
+
 了解了国际化，我们就来了解一下主题切换吧。他也是主要分为组件库的主题和我们自己内容的主题。
 
-对于组件库的主题切换，我们就直接修改他的css变量就行了。例如element-plus
-- 获取当前elemen-plus的所有样式。我们可以通过cdn进行获取当前版本的css文件
+对于组件库的主题切换，我们就直接修改他的 css 变量就行了。例如 element-plus
+
+- 获取当前 elemen-plus 的所有样式。我们可以通过 cdn 进行获取当前版本的 css 文件
+
 ```js
 async function getElementPlusStyles() {
   const { version } = await import('element-plus/package.json')
@@ -646,26 +711,30 @@ async function getElementPlusStyles() {
   return styles.data
 }
 ```
+
 - 找到我们想要替换的样式部分，通过正则完成替换。
 
-我们需要事先定义好，替换的颜色标志。（**根据element-plus提供的颜色值**）
+我们需要事先定义好，替换的颜色标志。（**根据 element-plus 提供的颜色值**）
+
 ```js
 // element-plus 默认色值
-  const colorMap = {
-    '#3a8ee6': 'shade-1',
-    '#409eff': 'primary',
-    '#53a8ff': 'light-1',
-    '#66b1ff': 'light-2',
-    '#79bbff': 'light-3',
-    '#8cc5ff': 'light-4',
-    '#a0cfff': 'light-5',
-    '#b3d8ff': 'light-6',
-    '#c6e2ff': 'light-7',
-    '#d9ecff': 'light-8',
-    '#ecf5ff': 'light-9'
-  }
+const colorMap = {
+  '#3a8ee6': 'shade-1',
+  '#409eff': 'primary',
+  '#53a8ff': 'light-1',
+  '#66b1ff': 'light-2',
+  '#79bbff': 'light-3',
+  '#8cc5ff': 'light-4',
+  '#a0cfff': 'light-5',
+  '#b3d8ff': 'light-6',
+  '#c6e2ff': 'light-7',
+  '#d9ecff': 'light-8',
+  '#ecf5ff': 'light-9'
+}
 ```
-用正则替换掉获取到的css文本中的对应的颜色值为标记。例如（#3a8ee6 => shade-1）
+
+用正则替换掉获取到的 css 文本中的对应的颜色值为标记。例如（#3a8ee6 => shade-1）
+
 ```js
 /**
  * 将主题颜色对应的css值改成对应的关键标志
@@ -696,11 +765,13 @@ async function generateElementPlusTemplate() {
   return styles
 }
 ```
-将styles文本中的标志替换成我们当前的主题色，在此之前，我们还需要处理一下根据当前主题色生成其他对应的辅色。
 
-这里需要使用到两个库来处理[`css-color-function`](https://www.npmjs.com/package/css-color-function)他是用来处理color()生成rgb颜色值，[`rgb-hex`](https://www.npmjs.com/package/rgb-hex)他是将rgb颜色转换成16进制颜色值。
+将 styles 文本中的标志替换成我们当前的主题色，在此之前，我们还需要处理一下根据当前主题色生成其他对应的辅色。
+
+这里需要使用到两个库来处理[`css-color-function`](https://www.npmjs.com/package/css-color-function)他是用来处理 color()生成 rgb 颜色值，[`rgb-hex`](https://www.npmjs.com/package/rgb-hex)他是将 rgb 颜色转换成 16 进制颜色值。
 
 定义根据主色生成辅色对象
+
 ```js
 //themeTemplate
 {
@@ -741,9 +812,11 @@ export function generateColors(currentColor) {
   return colors
 }
 ```
-- 把替换后的样式写入到style标签中，利用样式优先级的特性代替固有样式。
 
-生成完毕后，我们就可以替换掉styles中的标志了。然后生成style再插入到head中。
+- 把替换后的样式写入到 style 标签中，利用样式优先级的特性代替固有样式。
+
+生成完毕后，我们就可以替换掉 styles 中的标志了。然后生成 style 再插入到 head 中。
+
 ```js
 /**
  *
@@ -778,11 +851,12 @@ export async function insertStyleToPage(currentColor) {
 }
 ```
 
-对于第三方包主题，他是不可控的，我们需要拿到他编译后的css进行色值替换，利用style内部样式表优先级高于外部样式表的特性，来进行主题替换。
+对于第三方包主题，他是不可控的，我们需要拿到他编译后的 css 进行色值替换，利用 style 内部样式表优先级高于外部样式表的特性，来进行主题替换。
 
-对于自定义内容主题，我们只需要改变对应的css变量即可。在项目开发时，我们的menu菜单背景等，都是通过js变量的方式绑定到css中的。所以我们可以很轻松的改变js变量来达到css的变化。
+对于自定义内容主题，我们只需要改变对应的 css 变量即可。在项目开发时，我们的 menu 菜单背景等，都是通过 js 变量的方式绑定到 css 中的。所以我们可以很轻松的改变 js 变量来达到 css 的变化。
 
-比如在vuex中设置getters，当主题色发生变化，该getters就会重新计算，然后就会得到新的颜色变量并赋值。
+比如在 vuex 中设置 getters，当主题色发生变化，该 getters 就会重新计算，然后就会得到新的颜色变量并赋值。
+
 ```js
  // scss变量, 这里就是修改自定义样式的主题的。当主题色发生变化，我们将重新计算附属主题变量的值
   cssVar(state, getters) {
@@ -795,8 +869,11 @@ export async function insertStyleToPage(currentColor) {
 ```
 
 [案例代码](https://github.com/zhang-glitch/back_end_solution/tree/change-theme)
+
 ## 全屏
-可以使用[`screenfull`](https://www.npmjs.com/package/screenfull)库去实现。通过`toggle`触发全屏，并监听他的change事件来监听全屏的切换更改展示图标。
+
+可以使用[`screenfull`](https://www.npmjs.com/package/screenfull)库去实现。通过`toggle`触发全屏，并监听他的 change 事件来监听全屏的切换更改展示图标。
+
 ```js
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import screenfull from 'screenfull'
@@ -826,14 +903,17 @@ onUnmounted(() => {
   screenfull.off('change', change)
 })
 ```
+
 [案例代码](https://github.com/zhang-glitch/back_end_solution/)
 
 ## 搜索
+
 全局搜索功能在后台管理系统中是非常常见的，主要是让用户快速定位到目标。所以我们可以使用[fuse.js](https://www.fusejs.io/)库，来协助我们完成。
 
-由于fuse对收索的数据结构有特定要求，并结合当前我们的需求，搜索的关键字段需要是对象的直接属性。所以需要处理好数据。[这里是相关demo](https://www.fusejs.io/examples.html)
+由于 fuse 对收索的数据结构有特定要求，并结合当前我们的需求，搜索的关键字段需要是对象的直接属性。所以需要处理好数据。[这里是相关 demo](https://www.fusejs.io/examples.html)
 
 处理数据
+
 ```js
 /**
  * 筛选出可供搜索的路由对象
@@ -873,7 +953,8 @@ export const getFuseData = (routes, basePath = '/', prefixTitle = []) => {
 }
 ```
 
-初始化fuse
+初始化 fuse
+
 ```js
 let fuse
 const initFuse = (searchPool) => {
@@ -901,33 +982,37 @@ const initFuse = (searchPool) => {
 // 处理搜索数据源，并初始化fuse
 initFuse(generateStandardData.value)
 ```
+
 然后调用`fuse.search(value)`方法并传入搜索关键字就可以得到搜索列表了。
 
-如果搜索数据需要做到国际化，**我们是事先在搜索代码中已经将对应的字段转化了**。所以在切换国际化时，将不会被改变。这时候我们需要监听国际化的切换，然后再重新初始化一下fuse的数据源。
+如果搜索数据需要做到国际化，**我们是事先在搜索代码中已经将对应的字段转化了**。所以在切换国际化时，将不会被改变。这时候我们需要监听国际化的切换，然后再重新初始化一下 fuse 的数据源。
+
 ```js
- watch(
-    () => store.getters.language,
-    () => {
-      // 处理数据
-      const generateStandardData = computed(() => {
-          // 获取搜索数据源
-          const originData = generateMenus(router.getRoutes())
-          // 处理成标准数据
-          return getFuseData(originData)
-      })
-      initFuse(generateStandardData.value)
-    }
-  )
+watch(
+  () => store.getters.language,
+  () => {
+    // 处理数据
+    const generateStandardData = computed(() => {
+      // 获取搜索数据源
+      const originData = generateMenus(router.getRoutes())
+      // 处理成标准数据
+      return getFuseData(originData)
+    })
+    initFuse(generateStandardData.value)
+  }
+)
 ```
 
-这里需要注意一下，我们在搜索时，一般使用的是`select`组件，如element-plus中的select, 我们需要添加`remote`才可以将初始化的下拉字标去掉。然后绑定`remote-method`一个方法去处理搜索。
+这里需要注意一下，我们在搜索时，一般使用的是`select`组件，如 element-plus 中的 select, 我们需要添加`remote`才可以将初始化的下拉字标去掉。然后绑定`remote-method`一个方法去处理搜索。
 
 [案例代码](https://github.com/zhang-glitch/back_end_solution/)
 
 ## 自定义元素右键菜单
-通过web api [`contextMenu`](https://developer.mozilla.org/zh-CN/docs/Web/API/Element/contextmenu_event)去实现。
+
+通过 web api [`contextMenu`](https://developer.mozilla.org/zh-CN/docs/Web/API/Element/contextmenu_event)去实现。
 
 在元素中绑定`contextMenu`事件。并控制菜单的展示和隐藏，菜单的位置。菜单是我们自定义的组件。
+
 ```js
 <mouse-menu
   v-show="isMenu"
@@ -953,7 +1038,9 @@ const handleOpenMenu = (e, index) => {
   currentTagIndex.value = index
 }
 ```
+
 菜单组件。
+
 ```js
 // mouse-menu
 <template>
@@ -1031,7 +1118,9 @@ const handleCloseOtherClick = () => {
 }
 </style>
 ```
-**我们需要注意，在点击完菜单项时，菜单并不会关闭，所以我们需要自定义关闭事件，触发关闭。** 但是如果用户不点击菜单项，那么菜单也不会关闭，所以我们需要在菜单显示的时候，给body添加事件，让其关闭。
+
+**我们需要注意，在点击完菜单项时，菜单并不会关闭，所以我们需要自定义关闭事件，触发关闭。** 但是如果用户不点击菜单项，那么菜单也不会关闭，所以我们需要在菜单显示的时候，给 body 添加事件，让其关闭。
+
 ```js
 const closeMenu = () => {
   isMenu.value = false
@@ -1048,10 +1137,13 @@ watch(isMenu, (val) => {
   }
 })
 ```
+
 [案例代码](https://github.com/zhang-glitch/back_end_solution/)
 
 ## 路由动效切换错误
+
 [路由过度动效](https://router.vuejs.org/zh/guide/advanced/transitions.html)
+
 ```js
 <router-view v-slot="{ Component, route }">
   <transition name="fade" mode="out-in">
@@ -1061,11 +1153,14 @@ watch(isMenu, (val) => {
   </transition>
 </router-view>
 ```
+
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd227728d6584d9ea1f27167ee7eabe3~tplv-k3u1fbpfcp-watermark.image?)
 
 **在我们使用动效路由时，我们的路由组件不能是多个根标签。** 不然会报警告不显示内容。
+
 ## 定义全局属性
-这个还是挺常用的。例如组件中时间戳的处理，我们可以定义一个通用的处理方法，将其作为全局属性，然后再组件中直接使用即可，不需要每次都在组件中引入dayjs去处理了。
+
+这个还是挺常用的。例如组件中时间戳的处理，我们可以定义一个通用的处理方法，将其作为全局属性，然后再组件中直接使用即可，不需要每次都在组件中引入 dayjs 去处理了。
 
 ```js
 // 作为插件使用
@@ -1088,13 +1183,13 @@ export default function (app) {
     $timeFormat
   }
 }
-
 ```
 
-**在组件模板中可以直接使用，在setup语法中，我们可以通过`getCurrentInstance().appContext.config.globalProperties`获取到全局属性。**
-## excel导入功能
+**在组件模板中可以直接使用，在 setup 语法中，我们可以通过`getCurrentInstance().appContext.config.globalProperties`获取到全局属性。**
 
-使用[xlsx](https://www.npmjs.com/package/xlsx)来解析excel。然后传递解析后的数据。其实excel上传，也可以让后端去解析。
+## excel 导入功能
+
+使用[xlsx](https://www.npmjs.com/package/xlsx)来解析 excel。然后传递解析后的数据。其实 excel 上传，也可以让后端去解析。
 
 主要分为以下步骤，我们需要借助[`FileReader`](https://developer.mozilla.org/zh-CN/docs/Web/API/FileReader)来读取文件内容。
 
@@ -1119,7 +1214,9 @@ readFile.onload = (e) => {
   // 7. 传入解析之后的数据
   generateData({ header, results })
 ```
-有个需要注意的地方就是解析excel的时间是有误的，需要处理转化一下。
+
+有个需要注意的地方就是解析 excel 的时间是有误的，需要处理转化一下。
+
 ```js
 /**
  * 解析 excel 导入的时间格式
@@ -1141,18 +1238,23 @@ export const formatDate = (numb) => {
 ```
 
 还有就是直接导入`XLSX`时，会报错，因为他默认是没有到处默认变量的。所以我们要么结构，要么通过`* as`语法导入。
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b89b2b5b2a3e490cbdbac9c5cddeee67~tplv-k3u1fbpfcp-watermark.image?)
+
 ```js
 import * as XLSX from 'xlsx'
 ```
 
 如果我们想要拖拽文件到上传区域，我们需要使用[拖拽的一些事件](https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLElement/drag_event)进行处理。
 
-使用拖拽api的注意事项
--   拖拽对象需要设置`draggable`属性，目标对象可以不需要。
--   拖拽对象触发`ondragstart`事件。
--   如果想触发**目标事件的drop方法**，我们需要先触发**目标事件的dragover方法**，并且设置**阻止默认事件**。
+使用拖拽 api 的注意事项
+
+- 拖拽对象需要设置`draggable`属性，目标对象可以不需要。
+- 拖拽对象触发`ondragstart`事件。
+- 如果想触发**目标事件的 drop 方法**，我们需要先触发**目标事件的 dragover 方法**，并且设置**阻止默认事件**。
 
 一些事件
+
 - dragstart`: 开始拖拽对象时触发。在这里开始传递一些源数据。`e.dataTransfer.setData()`
 - `dragover`: 当被拖拽元素**未离开**可释放目标元素上时，触发该事件。**在拖拽的过程中。**
 - `dragleave`: 当被拖拽元素**离开**可释放目标元素上时，触发该事件。
@@ -1160,3 +1262,178 @@ import * as XLSX from 'xlsx'
 - `drop`: 拖拽元素拖拽到可释放目标对象释放后触发。即在这边获取拖拽元素时传入的一些源数据，做一些其他的逻辑处理。通过`e.dataTransfer.getData()`来获取对应的属性。
 
 [这里有一个小案例](https://code.juejin.cn/pen/7268960217457655867)
+
+[案例代码](https://github.com/zhang-glitch/back_end_solution/pull/new/upload-excel)
+
+## 导出为 excel
+
+- 获取数据
+- 将数据转为 excel 数据，并下载。
+
+处理数据主要就是 excel 表头和数据主体。数据主体处理成一个二维数组即可。子项如果是对象，我们可以通过`JSON.stringify`将其转 json 字符串，然后插入到 excel 中。
+
+```js
+// [{ username: '张三', roles: [{title: '主管'}], openTime: "2023-8-19"},{},{}]
+//  => [['张三', ['主管', '员工'], "2023-8-19"],[],[]]
+```
+
+使用到两个库
+
+- file-saver: 处理文件下载
+- xlsx
+
+```js
+// export2excel.js
+/* eslint-disable */
+import { saveAs } from 'file-saver'
+import XLSX from 'xlsx'
+
+function datenum(v, date1904) {
+  if (date1904) v += 1462
+  var epoch = Date.parse(v)
+  return (epoch - new Date(Date.UTC(1899, 11, 30))) / (24 * 60 * 60 * 1000)
+}
+
+function sheet_from_array_of_arrays(data, opts) {
+  var ws = {}
+  var range = {
+    s: {
+      c: 10000000,
+      r: 10000000
+    },
+    e: {
+      c: 0,
+      r: 0
+    }
+  }
+  for (var R = 0; R != data.length; ++R) {
+    for (var C = 0; C != data[R].length; ++C) {
+      if (range.s.r > R) range.s.r = R
+      if (range.s.c > C) range.s.c = C
+      if (range.e.r < R) range.e.r = R
+      if (range.e.c < C) range.e.c = C
+      var cell = {
+        v: data[R][C]
+      }
+      if (cell.v == null) continue
+      var cell_ref = XLSX.utils.encode_cell({
+        c: C,
+        r: R
+      })
+
+      if (typeof cell.v === 'number') cell.t = 'n'
+      else if (typeof cell.v === 'boolean') cell.t = 'b'
+      else if (cell.v instanceof Date) {
+        cell.t = 'n'
+        cell.z = XLSX.SSF._table[14]
+        cell.v = datenum(cell.v)
+      } else cell.t = 's'
+
+      ws[cell_ref] = cell
+    }
+  }
+  if (range.s.c < 10000000) ws['!ref'] = XLSX.utils.encode_range(range)
+  return ws
+}
+
+function Workbook() {
+  if (!(this instanceof Workbook)) return new Workbook()
+  this.SheetNames = []
+  this.Sheets = {}
+}
+
+function s2ab(s) {
+  var buf = new ArrayBuffer(s.length)
+  var view = new Uint8Array(buf)
+  for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
+  return buf
+}
+
+export const export_json_to_excel = ({
+  multiHeader = [],
+  header,
+  data,
+  filename,
+  merges = [],
+  autoWidth = true,
+  bookType = 'xlsx'
+} = {}) => {
+  // 1. 设置文件名称
+  filename = filename || 'excel-list'
+  // 2. 把数据解析为数组，并把表头添加到数组的头部
+  data = [...data]
+  data.unshift(header)
+  // 3. 解析多表头，把多表头的数据添加到数组头部（二维数组）
+  for (let i = multiHeader.length - 1; i > -1; i--) {
+    data.unshift(multiHeader[i])
+  }
+  // 4. 设置 Excel 表工作簿（第一张表格）名称
+  var ws_name = 'SheetJS'
+  // 5. 生成工作簿对象
+  var wb = new Workbook()
+  // 6. 将 data 数组（json格式）转化为 Excel 数据格式
+  var ws = sheet_from_array_of_arrays(data)
+  // 7. 合并单元格相关（['A1:A2', 'B1:D1', 'E1:E2']）
+  if (merges.length > 0) {
+    if (!ws['!merges']) ws['!merges'] = []
+    merges.forEach((item) => {
+      ws['!merges'].push(XLSX.utils.decode_range(item))
+    })
+  }
+  // 8. 单元格宽度相关
+  if (autoWidth) {
+    /*设置 worksheet 每列的最大宽度*/
+    const colWidth = data.map((row) =>
+      row.map((val) => {
+        /*先判断是否为null/undefined*/
+        if (val == null) {
+          return {
+            wch: 10
+          }
+        } else if (val.toString().charCodeAt(0) > 255) {
+          /*再判断是否为中文*/
+          return {
+            wch: val.toString().length * 2
+          }
+        } else {
+          return {
+            wch: val.toString().length
+          }
+        }
+      })
+    )
+    /*以第一行为初始值*/
+    let result = colWidth[0]
+    for (let i = 1; i < colWidth.length; i++) {
+      for (let j = 0; j < colWidth[i].length; j++) {
+        if (result[j]['wch'] < colWidth[i][j]['wch']) {
+          result[j]['wch'] = colWidth[i][j]['wch']
+        }
+      }
+    }
+    ws['!cols'] = result
+  }
+
+  // 9. 添加工作表（解析后的 excel 数据）到工作簿
+  wb.SheetNames.push(ws_name)
+  wb.Sheets[ws_name] = ws
+  // 10. 写入数据
+  var wbout = XLSX.write(wb, {
+    bookType: bookType,
+    bookSST: false,
+    type: 'binary'
+  })
+  // 11. 下载数据
+  saveAs(
+    new Blob([s2ab(wbout)], {
+      type: 'application/octet-stream'
+    }),
+    `${filename}.${bookType}`
+  )
+}
+```
+
+## 报错
+
+- [`defineProps` is referencing locally declared variables.](https://juejin.cn/post/7208455127744757818)
+- [Uncaught (in promise) SyntaxError: Must be called at the top of a `setup` function](https://www.cnblogs.com/zhanglw456/p/16626847.html)。在引入 I18n 库时，报错。我们需要引入自己本地创建的 I18n 实例。

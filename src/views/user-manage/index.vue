@@ -27,7 +27,7 @@
     </el-table> -->
     <el-card>
       <el-button type="primary" @click="handleImportExcel">导入</el-button>
-      <el-button type="success">导出</el-button>
+      <el-button type="success" @click="handleExportExcel">导出</el-button>
     </el-card>
     <el-table :data="userList">
       <el-table-column label="#" type="index" index="1" />
@@ -103,16 +103,32 @@
       <upload-excel :successUpload="successUpload"></upload-excel>
     </el-dialog>
     <!-- 导出 -->
+    <el-dialog v-model="exportDialogVisible" title="导出" width="40%">
+      <download-excel v-model:templateValue="templateValue"></download-excel>
+      <template #footer>
+        <el-button @click="exportDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleEnsureExport"> 确认 </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 // import { tableColumn } from './data'
-import { getUserList, userBatchImport, deleteUser } from '@/api/user-manager'
+import {
+  getUserList,
+  userBatchImport,
+  deleteUser,
+  getUserManageAllList
+} from '@/api/user-manager'
 import UploadExcel from '@/components/upload-excel/index.vue'
+import DownloadExcel from '@/components/download-excel/index.vue'
 import { ElMessage } from 'element-plus'
 import { USER_RELATIONS, formatDate } from './data'
+// eslint-disable-next-line camelcase
+import { export_json_to_excel } from '@/utils/Export2Excel'
+import { $timeFormat } from '@/utils/filter'
 
 const reqParams = ref({
   page: 1,
@@ -122,6 +138,8 @@ const reqParams = ref({
 const userTotal = ref(0)
 const userList = ref([])
 const dialogVisible = ref(false)
+const exportDialogVisible = ref(false)
+const templateValue = ref('')
 // const globalProperties = getCurrentInstance().appContext.config.globalProperties
 
 /**
@@ -173,6 +191,13 @@ const handleImportExcel = () => {
 }
 
 /**
+ * 导出
+ */
+const handleExportExcel = async () => {
+  exportDialogVisible.value = true
+}
+
+/**
  * 筛选数据
  */
 const generateData = (results) => {
@@ -207,6 +232,52 @@ const successUpload = async (data) => {
   } finally {
     dialogVisible.value = false
   }
+}
+
+/**
+ * 确认导出
+ */
+const handleEnsureExport = async () => {
+  // 获取当前所有用户
+  const { list } = await getUserManageAllList()
+  if (list && list.length) {
+    // 转换数据
+    const headers = Object.keys(USER_RELATIONS)
+    const data = transformData(list)
+    console.log('data', data)
+    export_json_to_excel({
+      header: headers,
+      // 二维数组
+      data,
+      // 文件名称
+      filename: templateValue.value,
+      // 是否自动列宽
+      autoWidth: true,
+      // 文件类型
+      bookType: 'xlsx'
+    })
+  }
+  exportDialogVisible.value = false
+}
+
+const transformData = (data) => {
+  // [{ username: '张三', roles: [{title: '主管'}], openTime: "2023-8-19"},{},{}]
+  //  => [[['张三', ['主管', '员工'], "2023-8-19"]],[],[]]
+  // key 表示对应excel表头汉字。这里返回格式 ['张三', ['主管', '员工'], "2023-8-19"]
+  return data.map((item) => {
+    return Object.keys(USER_RELATIONS).map((key) => {
+      const header = USER_RELATIONS[key]
+      // 处理roles
+      if (header === 'role') {
+        return JSON.stringify(item.role.map((roleItem) => roleItem.title))
+      }
+      // 处理时间
+      if (USER_RELATIONS[key] === 'openTime') {
+        return $timeFormat(item[header])
+      }
+      return item[header]
+    })
+  })
 }
 </script>
 
