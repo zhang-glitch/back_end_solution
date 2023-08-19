@@ -20,10 +20,15 @@ import SvgIcon from './assets/icons'
 
 import './permission'
 
+// 添加全局属性插件
+import globalProperties from '@/utils/filter'
+
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
+
+globalProperties(app)
 
 app
   .use(router)
