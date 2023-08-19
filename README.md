@@ -1433,6 +1433,47 @@ export const export_json_to_excel = ({
 }
 ```
 
+[案例代码](https://github.com/zhang-glitch/back_end_solution/pull/new/download-excel)
+
+## 打印功能
+
+使用[vue3-print-nb](https://www.npmjs.com/package/vue3-print-nb) 进行打印。
+
+注册全局指令
+
+```js
+import print from 'vue3-print-nb'
+
+export default (app) => {
+  app.use(print)
+}
+```
+
+定义指令值
+
+```js
+const printObj = {
+  // 打印区域
+  id: 'userInfoBox',
+  // 打印标题
+  popTitle: '成员信息',
+  // 打印前
+  beforeOpenCallback(vue) {
+    printLoading.value = true
+  },
+  // 执行打印
+  openCallback(vue) {
+    printLoading.value = false
+  }
+}
+```
+
+使用
+
+```js
+ <el-button type="primary" :loading="printLoading" v-print="printObj" >打印</el-button>
+```
+
 ## 报错
 
 - [`defineProps` is referencing locally declared variables.](https://juejin.cn/post/7208455127744757818)

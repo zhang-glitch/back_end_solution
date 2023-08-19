@@ -22,6 +22,8 @@ import './permission'
 
 // 添加全局属性插件
 import globalProperties from '@/utils/filter'
+// 添加全局指令
+import directives from '@/directives'
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
@@ -29,6 +31,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 globalProperties(app)
+directives(app)
 
 app
   .use(router)

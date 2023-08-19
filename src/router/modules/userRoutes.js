@@ -35,7 +35,7 @@ export default {
       }
     },
     {
-      path: '/user/info/:id',
+      path: '/user/info',
       name: 'userInfo',
       component: () => import('@/views/user-info/index.vue'),
       props: true,

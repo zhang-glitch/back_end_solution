@@ -129,7 +129,9 @@ import { USER_RELATIONS, formatDate } from './data'
 // eslint-disable-next-line camelcase
 import { export_json_to_excel } from '@/utils/Export2Excel'
 import { $timeFormat } from '@/utils/filter'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const reqParams = ref({
   page: 1,
   size: 5
@@ -155,7 +157,9 @@ fetchUserList()
 /**
  * 查看详情
  */
-const handleShowClick = () => {}
+const handleShowClick = (id) => {
+  router.push(`/user/info?id=${id}`)
+}
 /**
  * 查看角色
  */
