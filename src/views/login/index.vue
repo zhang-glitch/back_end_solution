@@ -102,7 +102,7 @@ const handleLogin = async () => {
         setTimeStamp()
         router.push('/')
         // // 获取用户信息
-        await store.dispatch('user/getUserInfo')
+        // await store.dispatch('user/getUserInfo')
         // const { permission } = await store.dispatch('user/getUserInfo')
         // // 处理用户权限，筛选出需要添加的权限
         // const filterRoutes = await store.dispatch(

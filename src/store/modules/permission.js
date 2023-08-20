@@ -25,18 +25,32 @@ export default {
       menus?.forEach((key) => {
         // 权限名 与 路由的 name 匹配
         routes.push(
-          ...privateRoutes.filter((item) => {
-            const parent = { ...item, children: [] }
+          ...privateRoutes.map((item, index) => {
+            let parent = {}
+            if (index > 0) {
+              parent = { ...item, children: [...item.children] }
+            } else {
+              parent = { ...item, children: [] }
+            }
             const children = item?.children
-            parent.children.push(
-              children?.filter((childItem) => {
-                return childItem?.meta?.title === key
-              })
-            )
+            children.forEach((childItem) => {
+              if (childItem?.meta?.title === key) {
+                parent.children.push(childItem)
+              }
+            })
+            // parent.children.push(
+            //   ...children?.filter((childItem) => {
+            //     return childItem?.meta?.title === key
+            //   })
+            // )
             return parent
           })
         )
       })
+
+      // console.log('routes', privateRoutes, routes)
+
+      // routes = routes.filter((item) => item.children.length)
       /**
        * 最后添加 不匹配路由进入 404
        * 所有不匹配的路由全部进入404

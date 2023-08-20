@@ -9,7 +9,9 @@ export default {
   state() {
     return {
       token: getItem(TOKEN) || '',
-      userInfo: getItem(USERINFO) || {}
+      // userInfo: getItem(USERINFO) || {}
+      // 这里不缓存，不然动态路由添加后，刷新将会丢失
+      userInfo: {}
     }
   },
   getters: {},

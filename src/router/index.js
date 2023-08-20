@@ -50,15 +50,8 @@ export default router
  * 初始化路由表
  */
 export function resetRouter() {
-  // const menus = [
-  //   'user',
-  //   '404',
-  //   '401',
-  //   'profile',
-  //   'permissionList',
-  //   'articleRanking'
-  // ]
-  // menus.forEach((menu) => {
-  //   router.removeRoute(menu)
-  // })
+  const menus = ['permissionList', 'articleRanking']
+  menus.forEach((menu) => {
+    router.removeRoute(menu)
+  })
 }
