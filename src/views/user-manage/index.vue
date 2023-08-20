@@ -26,7 +26,12 @@
       </template>
     </el-table> -->
     <el-card>
-      <el-button type="primary" @click="handleImportExcel">导入</el-button>
+      <el-button
+        type="primary"
+        @click="handleImportExcel"
+        v-permission="'importUser'"
+        >导入</el-button
+      >
       <el-button type="success" @click="handleExportExcel">导出</el-button>
     </el-card>
     <el-table :data="userList">
@@ -110,11 +115,13 @@
         <el-button type="primary" @click="handleEnsureExport"> 确认 </el-button>
       </template>
     </el-dialog>
+    <!-- 分配角色 -->
+    <DistributeRole v-model="roleDialog" :roleId="roleId" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 // import { tableColumn } from './data'
 import {
   getUserList,
@@ -130,6 +137,7 @@ import { USER_RELATIONS, formatDate } from './data'
 import { export_json_to_excel } from '@/utils/Export2Excel'
 import { $timeFormat } from '@/utils/filter'
 import { useRouter } from 'vue-router'
+import DistributeRole from './components/distribute-role.vue'
 
 const router = useRouter()
 const reqParams = ref({
@@ -142,6 +150,8 @@ const userList = ref([])
 const dialogVisible = ref(false)
 const exportDialogVisible = ref(false)
 const templateValue = ref('')
+const roleDialog = ref(false)
+const roleId = ref('')
 // const globalProperties = getCurrentInstance().appContext.config.globalProperties
 
 /**
@@ -153,7 +163,7 @@ const fetchUserList = async () => {
   userList.value = list
 }
 fetchUserList()
-
+console.log('router.getRoutes()', router.getRoutes())
 /**
  * 查看详情
  */
@@ -163,7 +173,15 @@ const handleShowClick = (id) => {
 /**
  * 查看角色
  */
-const handleShowRoleClick = () => {}
+const handleShowRoleClick = (row) => {
+  roleId.value = row._id
+  roleDialog.value = true
+}
+watch(roleDialog, (val) => {
+  if (!val) {
+    fetchUserList()
+  }
+})
 /**
  * 删除
  */

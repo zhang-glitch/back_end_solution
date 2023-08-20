@@ -31,5 +31,9 @@ export default {
   // viwTags
   viewTags(state) {
     return state.app.viewTags
+  },
+  // 菜单列表
+  routes(state) {
+    return state.permission.routes
   }
 }

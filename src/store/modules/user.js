@@ -2,7 +2,7 @@ import md5 from 'md5'
 import { postLogin, getUserInfo } from '@/api/user'
 import { getItem, setItem, removeAllItem } from '@/utils/storage'
 import { TOKEN, USERINFO } from '@/constants'
-import router from '../../router'
+import router, { resetRouter } from '../../router'
 
 export default {
   namespaced: true,
@@ -33,9 +33,11 @@ export default {
     async getUserInfo({ commit }) {
       const res = await getUserInfo()
       commit('setUserInfo', res)
+      return res
     },
     // 退出登录
     async logout() {
+      resetRouter()
       this.commit('user/setToken', '')
       this.commit('user/setUserInfo', {})
       removeAllItem()

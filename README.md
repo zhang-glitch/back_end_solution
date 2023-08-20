@@ -1474,7 +1474,69 @@ const printObj = {
  <el-button type="primary" :loading="printLoading" v-print="printObj" >打印</el-button>
 ```
 
+[案例代码](https://github.com/zhang-glitch/back_end_solution.git)
+
+## 权限控制
+
+- 用户列表可以指定角色。
+- 角色列表可以分配权限。
+- 权限列表可以所有权限。
+
+用户-> 角色 -> 权限。RBAC 权限控制体系，他就是基于角色的权限控制用户的访问。
+
+就是结合后台返回的角色权限列表，配合动态路由`router.addRoute()`进行路由动态注册。
+
+## 自定义指令
+
+一般自定义指令都是全局的，局部的也没必要使用指令了。通过`app.directive('name', directiveObj)`来进行注册。
+
+内部提供一些生命周期钩子去辅助我们编写指令逻辑。[不明白的可以看这里](https://juejin.cn/post/7020428066996355108#heading-73)
+
+```js
+import store from '@/store'
+
+export default function () {
+  return {
+    mounted(el, bindings) {
+      // 取出指令值
+      const { value } = bindings
+      // 获取按钮权限列表
+      const actionPermissions = store.getters.userInfo.permission.points || []
+      // 一个值 || 一个数组
+      if (
+        (value &&
+          ['number', 'string'].includes(typeof value) &&
+          actionPermissions.includes(value)) ||
+        (value &&
+          Array.isArray(value) &&
+          value.filter((item) => actionPermissions.includes(item)).length ===
+            value.length)
+      ) {
+        // eslint-disable-next-line no-useless-return
+        return
+      } else {
+        el.parentNode && el.parentNode.removeChild(el)
+      }
+    }
+  }
+}
+```
+
+```js
+// 注册
+import permission from './permission'
+
+export default (app) => {
+  app.directive('permission', permission())
+}
+```
+
 ## 报错
 
 - [`defineProps` is referencing locally declared variables.](https://juejin.cn/post/7208455127744757818)
+
 - [Uncaught (in promise) SyntaxError: Must be called at the top of a `setup` function](https://www.cnblogs.com/zhanglw456/p/16626847.html)。在引入 I18n 库时，报错。我们需要引入自己本地创建的 I18n 实例。
+
+- v-model cannot be used on a prop, because local prop bindings are not writable. Use a v-bind binding combined with a v-on listener that emits update:x event instead. 这个报错是因为模板中 v-model 直接绑定了 props 变量，所以报错。解决办法是我们在当前组件定义一个 ref 类型，通过 watch 去监听 props 变化，做到响应式。因为 setup 语法只执行一次，不具备响应式，所以需要通过 watch 监听。模板中直接使用是没有问题的。(除了 v-model 绑定外)
+
+- [Cannot access 'publicRoutes' before initialization](https://juejin.cn/post/7117279304509030436)。在 vuex 中动态添加路由时，给 state 变量初始化值报错。

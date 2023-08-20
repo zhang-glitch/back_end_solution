@@ -1,5 +1,5 @@
 export default {
-  name: '',
+  name: 'profile',
   path: '/',
   redirect: '/profile',
   component: () => import('@/views/layout/index.vue'),

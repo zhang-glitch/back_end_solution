@@ -29,13 +29,16 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { generateMenus } from '@/utils/route'
 import SideBarItem from './SideBarItem.vue'
 
 const router = useRouter()
-const menus = generateMenus(router.getRoutes())
+const menus = ref([])
+setTimeout(() => {
+  menus.value = generateMenus(router.getRoutes())
+}, 500)
 
 const route = useRoute()
 const activeMenu = computed(() => {

@@ -101,8 +101,18 @@ const handleLogin = async () => {
         // 登录成功后保存登录时间戳
         setTimeStamp()
         router.push('/')
-        // 获取用户信息
-        store.dispatch('user/getUserInfo')
+        // // 获取用户信息
+        await store.dispatch('user/getUserInfo')
+        // const { permission } = await store.dispatch('user/getUserInfo')
+        // // 处理用户权限，筛选出需要添加的权限
+        // const filterRoutes = await store.dispatch(
+        //   'permission/filterRoutes',
+        //   permission.menus
+        // )
+        // // 利用 addRoute 循环添加
+        // filterRoutes.forEach((item) => {
+        //   router.addRoute(item)
+        // })
       } finally {
         loading.value = false
       }

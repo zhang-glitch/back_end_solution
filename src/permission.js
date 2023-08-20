@@ -22,6 +22,18 @@ router.beforeEach(async (to, from, next) => {
         if (findIndex === -1 && to.path !== '/404' && to.path !== '/401') {
           store.commit('app/setViewTags', [...tags, to])
         }
+        const { permission } = store.getters.userInfo
+        console.log('userInfo', permission)
+        // 处理动态路由添加
+        // 处理用户权限，筛选出需要添加的权限
+        const filterRoutes = await store.dispatch(
+          'permission/filterRoutes',
+          permission?.menus
+        )
+        // 利用 addRoute 循环添加
+        filterRoutes.forEach((item) => {
+          router.addRoute(item)
+        })
         next()
         // return true
       } else {
