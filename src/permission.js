@@ -23,15 +23,16 @@ router.beforeEach(async (to, from, next) => {
           store.commit('app/setViewTags', [...tags, to])
         }
         const { permission } = store.getters.userInfo
-        console.log('userInfo', permission)
         // 处理动态路由添加
         // 处理用户权限，筛选出需要添加的权限
         const filterRoutes = await store.dispatch(
           'permission/filterRoutes',
           permission?.menus
         )
+        console.log('userInfo', filterRoutes)
         // 利用 addRoute 循环添加
         filterRoutes.forEach((item) => {
+          console.log('tianjai1')
           router.addRoute(item)
         })
         next()

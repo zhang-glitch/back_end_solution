@@ -1531,6 +1531,47 @@ export default (app) => {
 }
 ```
 
+## 表格拖动
+
+监听鼠标时间，完成对应的页面重绘。
+
+- 监听鼠标按下事件
+- 监听鼠标移动事件
+- 生成对应的 UI 样式
+- 监听鼠标抬起事件
+
+我们可以使用[sortablejs](http://www.sortablejs.com/)去实现。拖拽只是在视觉上实现了交换，如果刷新页面还是会回到原来的排序状态，我们还需要调用后端接口，去改变数据库中的数据顺序。`onEnd`事件可以拿到拖拽前后的下标值。从 0 开始。
+
+```js
+// 排序相关
+export const tableRef = ref(null)
+
+/**
+ * 初始化排序
+ */
+export const initSortable = (tableData, cb) => {
+  // 1. 要拖拽的元素
+  const el = tableRef.value.$el.querySelectorAll('.el-table__body > tbody')[0]
+  // 2. 配置对象
+  Sortable.create(el, {
+    // 拖拽时类名
+    ghostClass: 'sortable-ghost',
+    // 拖拽结束的回调方法
+    async onEnd(event) {
+      const { newIndex, oldIndex } = event
+      // TODO:拿到对应的值调用接口进行排序
+
+      // 直接重新获取数据无法刷新 table！！
+      tableData.value = []
+      // 重新获取数据
+      cb && cb()
+    }
+  })
+}
+```
+
+**这里需要注意一下，如果我们向外界传递 ref 值，我们应该直接传递，而不是取出 value 在传递。防止响应式丢失。**
+
 ## 报错
 
 - [`defineProps` is referencing locally declared variables.](https://juejin.cn/post/7208455127744757818)
